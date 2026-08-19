@@ -11,21 +11,23 @@ import {
     reactivarTramite
 } from "./tramite.controller.js";
 
+import { estaAutenticado } from "../../middleware/autenticacion.middleware.js";
+
 const router = Router();
 
-router.get('/', obtenerTramites);
+router.get('/', estaAutenticado(), obtenerTramites);
 
-router.get('/buscar', buscarTramites);
+router.get('/buscar', estaAutenticado(), buscarTramites);
 
-router.post('/', crearTramite);
+router.post('/', estaAutenticado(), crearTramite);
 
-router.put('/:id', actualizarTramite);
+router.put('/:id', estaAutenticado(), actualizarTramite);
 
-router.put('/:id/baja', darDeBajaTramite);
+router.put('/:id/baja', estaAutenticado(), darDeBajaTramite);
 
-router.put('/:id/enviar-reactivar', enviarAReactivarTramite);
+router.put('/:id/enviar-reactivar', estaAutenticado(), enviarAReactivarTramite);
 
-router.put('/:id/reactivar', reactivarTramite);
+router.put('/:id/reactivar', estaAutenticado(), reactivarTramite);
 
 
 export default router;

@@ -31,7 +31,7 @@ CREATE TABLE usuarios (
     nombre VARCHAR(100) NOT NULL,
     apellido VARCHAR(100) NOT NULL,
     email VARCHAR(150) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
+    contraseña VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -57,6 +57,29 @@ CREATE TABLE tramites (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- =========================================================
+-- RECORDATORIOS
+-- =========================================================
+
+CREATE TABLE recordatorios (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    -- Usuario que creó el recordatorio
+    user_id UUID NOT NULL,
+    -- Texto del recordatorio
+    descripcion VARCHAR(255) NOT NULL,
+    -- Día en que ocurre el evento
+    fecha_evento DATE NOT NULL,
+    -- Hora en que ocurre el evento
+    hora_evento TIME NOT NULL,
+    -- Cuántos minutos antes quiero recibir la notificación
+    minutos_antes INTEGER NOT NULL DEFAULT 5,
+    -- Permite saber si el recordatorio ya fue atendido
+    completado BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_recordatorio_usuario
+        FOREIGN KEY (user_id)
+        REFERENCES usuarios(id)
+);
 
 -- =========================================================
 -- RELACIONES

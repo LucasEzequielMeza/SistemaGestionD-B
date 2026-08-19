@@ -7,7 +7,7 @@ VERSIÓN CON AUTENTICACIÓN
 ==========================================================
 */
 
- /*
+ 
 export const obtenerTramites = async (req, res) => {
 
     try {
@@ -404,7 +404,7 @@ export const eliminarTramite = async (req, res) => {
     }
 };
 
-*/
+
 
 
 /*
@@ -415,7 +415,7 @@ SOLAMENTE PARA REALIZAR LAS PRUEBAS ACTUALES
 */
 
 
-export const obtenerTramites = async (req, res) => {
+/*export const obtenerTramites = async (req, res) => {
 
     try {
 
@@ -770,4 +770,4 @@ export const eliminarTramite = async (req, res) => {
             error: "Error al eliminar el trámite"
         });
     }
-};
+};*/
