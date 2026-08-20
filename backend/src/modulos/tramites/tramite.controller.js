@@ -97,18 +97,22 @@ export const buscarTramites = async (req, res) => {
 
 export const crearTramite = async (req, res, next) => {
 
-    // Obtenemos los datos enviados desde el frontend
     const {
         tipo_tramite_id,
         numero_carpeta,
         nombre_cliente
     } = req.body;
 
+    const client = await pool.connect();
+
     try {
 
-        const result = await pool.query(`
+        // Iniciamos una transacción
+        await client.query('BEGIN');
 
-            -- Creamos el nuevo trámite
+        // Creamos el trámite
+        const tramiteResult = await client.query(`
+
             INSERT INTO tramites (
                 tipo_tramite_id,
                 user_id,
@@ -118,7 +122,6 @@ export const crearTramite = async (req, res, next) => {
 
             VALUES ($1, $2, $3, $4)
 
-            -- Devolvemos el trámite creado
             RETURNING *
 
         `, [
@@ -128,20 +131,68 @@ export const crearTramite = async (req, res, next) => {
             nombre_cliente
         ]);
 
-        return res.status(201).json(result.rows[0]);
+        const tramite = tramiteResult.rows[0];
+
+        // Buscamos los documentos que corresponden al tipo de trámite
+        const documentosResult = await client.query(`
+
+            SELECT documento_id
+
+            FROM tipo_tramite_documentos
+
+            WHERE tipo_tramite_id = $1
+
+        `, [tipo_tramite_id]);
+
+        // Creamos los documentos correspondientes al trámite
+        for (const documento of documentosResult.rows) {
+
+            await client.query(`
+
+                INSERT INTO tramite_documentos (
+                    tramite_id,
+                    documento_id
+                )
+
+                VALUES ($1, $2)
+
+            `, [
+                tramite.id,
+                documento.documento_id
+            ]);
+        }
+
+        // Confirmamos todos los cambios
+        await client.query('COMMIT');
+
+        // Devolvemos el trámite creado
+        return res.status(201).json({
+            tramite,
+            documentos_creados: documentosResult.rowCount
+        });
 
     } catch (error) {
 
-        if (error.code === "23505") {
+        // Si algo falla, deshacemos todos los cambios
+        await client.query('ROLLBACK');
 
+        console.error('Error al crear el trámite:', error);
+
+        if (error.code === "23505") {
             return res.status(409).json({
                 message: "El trámite ya existe"
             });
         }
 
         next(error);
+
+    } finally {
+
+        // Liberamos la conexión
+        client.release();
     }
 };
+
 
 
 export const actualizarTramite = async (req, res) => {

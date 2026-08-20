@@ -7,6 +7,7 @@ import tipoTramitesRoutes from "./modulos/tipo_tramites/tipo_tramite.routes.js";
 import tramitesRoutes from "./modulos/tramites/tramite.routes.js";
 import recordatoriosRoutes from "./modulos/recordatorios/recordatorios.routes.js";
 import usuarioRoutes from "./modulos/usuarios/usuario.routes.js";
+import documentosRoutes from "./modulos/documentos/documentos.routes.js"
 const app = express();
 
 // Middlewares
@@ -22,6 +23,7 @@ app.use("/api/tipo-tramites", tipoTramitesRoutes);
 app.use("/api/tramites", tramitesRoutes);
 app.use("/api/recordatorios", recordatoriosRoutes);
 app.use("/api/usuarios", usuarioRoutes);
+app.use("/api/documentos", documentosRoutes)
 
 // Manejador de erores en express para todas las rutas
 

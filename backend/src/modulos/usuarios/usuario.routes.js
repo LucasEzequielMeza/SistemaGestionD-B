@@ -19,7 +19,7 @@ router.get("/:id", estaAutenticado(), obtenerUsuarioPorId);
 
 router.put("/:id", estaAutenticado(), actualizarUsuario);
 
-router.put("/:id/contraseña", estaAutenticado(), cambiarContraseña);
+router.put("/:id/password", estaAutenticado(), cambiarContraseña);
 
 router.put("/:id/estado", estaAutenticado(), cambiarEstadoUsuario);
 
