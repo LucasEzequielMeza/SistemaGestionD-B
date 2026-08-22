@@ -1,8 +1,73 @@
-import React from 'react'
+import React from "react"
+import Card from "../Components/UI/Card"
+import Input from "../Components/UI/Input"
+import Label from "../Components/UI/Label"
+import Button from "../Components/UI/Button"
+import {useForm} from "react-hook-form"
+import {Link, useNavigate} from "react-router-dom"
+import axios from "../Api/axios.js"
 
 function RegisterPage() {
+
+  const {register,
+    handleSubmit, 
+    formState: { errors }
+  } = useForm();
+
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      const respuesta = await axios.post("/register", data);
+
+      console.log(respuesta.data);
+
+    } catch (error) {
+      console.error(error);
+    }
+  });
+
   return (
-    <div>RegisterPage</div>
+    <div className='h-[calc(100vh-8rem)] flex items-center justify-center'>
+      <Card>
+        <h1 className='text-2xl font-bold text-white flex items-center justify-center'>Registro</h1>
+        <form onSubmit={onSubmit}>
+
+          <Label htmlFor="nombre">Nombre</Label>
+          <Input {...register("nombre", { required: true})} type="text" placeholder="Ingresar nombre" />
+          {
+            errors.nombre && <p className="text-red-500">El nombre es requerido</p>
+          }
+
+          <Label htmlFor="apellido">Apellido</Label>
+          <Input {...register("apellido", { required: true})} type="text" placeholder="Ingresar apellido" />
+          {
+            errors.apellido && <p className="text-red-500">El apellido es requerido</p>
+          }
+
+          <Label htmlFor="email">Mail</Label>
+          <Input {...register("mail", { required: true})} type="email" placeholder="Correo electrónico" />
+          {
+            errors.email && <p className="text-red-500">El correo es requerido</p>
+          }
+
+          <Label htmlFor="contraseña">Contraseña</Label>
+          <Input {...register("contraseña", { required: true})} type="password" placeholder="Contraseña" />
+          {
+            errors.password && <p className="text-red-500">La contraseña es requerida</p>
+          }
+
+          <div className="flex justify-center mt-4">
+            <Button type="submit">
+              Crear cuenta
+            </Button>
+          </div>
+        </form>
+        <div className='flex justify-between my-4'>
+          <p className="text-center text-gray-400">
+            ¿Tienes una cuenta? <Link className='font-bold' to="/iniciar-sesion">Ingresa aquí</Link>
+          </p>
+        </div>
+      </Card>
+    </div>
   )
 }
 

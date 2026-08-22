@@ -1,3 +1,4 @@
+import React from "react"
 import { Routes, Route } from "react-router-dom"
 import LoginPage from "./Page/LoginPage"
 import RegisterPage from "./Page/RegisterPage"
@@ -5,7 +6,7 @@ import TramitesPage from "./Page/TramitesPage"
 import RecordatoriosPage from "./Page/RecordatoriosPage"
 import TramiteForm from "./Components/tramites/TramiteForm"
 import TramiteDetalle from "./Components/tramites/TramiteDetalle"
-import RecordatoriosForm from "./Components/recordatorios/RecordatoriosForm"
+import RecordatoriosForm from "./Components/recordatorios/RecordatorioForm"
 
 
 function App() {

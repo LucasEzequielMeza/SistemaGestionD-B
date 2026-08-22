@@ -132,7 +132,7 @@ export const register = async (req, res) => {
         // Guardamos el token en una cookie HTTP-Only
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            secure: true,
             sameSite: process.env.NODE_ENV === 'production'
                 ? 'none'
                 : 'lax',
