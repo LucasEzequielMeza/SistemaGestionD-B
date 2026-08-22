@@ -5,9 +5,13 @@ import Label from "../Components/UI/Label"
 import Button from "../Components/UI/Button"
 import {useForm} from "react-hook-form"
 import {Link, useNavigate} from "react-router-dom"
-import axios from "../Api/axios.js"
+import { useAuth } from "../Context/ContextoAutorizacion.jsx"
 
 function RegisterPage() {
+
+  const {register: registerContexto, erroresBackEnd} = useAuth()
+
+  const navigate = useNavigate()
 
   const {register,
     handleSubmit, 
@@ -15,13 +19,9 @@ function RegisterPage() {
   } = useForm();
 
   const onSubmit = handleSubmit(async (data) => {
-    try {
-      const respuesta = await axios.post("/register", data);
-
-      console.log(respuesta.data);
-
-    } catch (error) {
-      console.error(error);
+    const usuario = await registerContexto(data)
+    if (usuario) {
+      navigate("/tramites")
     }
   });
 
@@ -46,13 +46,13 @@ function RegisterPage() {
           <Label htmlFor="email">Mail</Label>
           <Input {...register("mail", { required: true})} type="email" placeholder="Correo electrónico" />
           {
-            errors.email && <p className="text-red-500">El correo es requerido</p>
+            errors.mail && <p className="text-red-500">El correo es requerido</p>
           }
 
           <Label htmlFor="contraseña">Contraseña</Label>
           <Input {...register("contraseña", { required: true})} type="password" placeholder="Contraseña" />
           {
-            errors.password && <p className="text-red-500">La contraseña es requerida</p>
+            errors.contraseña && <p className="text-red-500">La contraseña es requerida</p>
           }
 
           <div className="flex justify-center mt-4">

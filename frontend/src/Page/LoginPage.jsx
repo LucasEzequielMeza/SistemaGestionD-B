@@ -3,23 +3,23 @@ import Card from "../Components/UI/Card"
 import Input from "../Components/UI/Input"
 import Button from '../components/UI/Button';
 import Label from '../components/UI/Label';
-import axios from "../Api/axios.js"
 import {Link, useNavigate} from "react-router-dom"
 import {useForm} from "react-hook-form"
+import { useAuth } from '../Context/ContextoAutorizacion.jsx';
 
 
 function LoginPage() {
 
+  const {login, erroresBackEnd} = useAuth();
+
+  const navigate = useNavigate();
+
   const {register, handleSubmit} = useForm ();
   
   const onSubmit = handleSubmit(async (data) => {
-    try {
-      const respuesta = await axios.post("/login", data);
-
-      console.log(respuesta.data);
-
-    } catch (error) {
-      console.error(error);
+    const usuario = await login(data)
+    if (usuario) {
+      navigate("/tramites")
     }
   })
 
@@ -53,7 +53,7 @@ return (
         </form>
         <div className='flex justify-between my-4'>
           <p className='text-center text-gray-400'>
-            ¿No tienes una cuenta? <Link className='font-bold' to='/register'>Regístrate aquí</Link>
+            ¿No tienes una cuenta? <Link className='font-bold' to='/registro'>Regístrate aquí</Link>
           </p>
         </div>
       </Card>

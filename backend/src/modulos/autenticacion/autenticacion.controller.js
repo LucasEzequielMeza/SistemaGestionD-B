@@ -59,7 +59,7 @@ export const login = async (req, res) => {
         // Devolvemos solamente los datos necesarios
         return res.status(200).json({
             success: true,
-            user: {
+            usuario: {
                 id: result.rows[0].id,
                 mail: result.rows[0].mail
             }
@@ -132,16 +132,21 @@ export const register = async (req, res) => {
         // Guardamos el token en una cookie HTTP-Only
         res.cookie('token', token, {
             httpOnly: true,
-            secure: true,
+            secure: process.env.NODE_ENV === 'production',
             sameSite: process.env.NODE_ENV === 'production'
                 ? 'none'
                 : 'lax',
             maxAge: 24 * 60 * 60 * 1000
         });
 
-        return res.status(201).json({
+        return res.status(200).json({
             success: true,
-            usuario: result.rows[0]
+            usuario: {
+                id: result.rows[0].id,
+                nombre: result.rows[0].nombre,
+                apellido: result.rows[0].apellido,
+                mail: result.rows[0].mail
+            }
         });
 
     } catch (error) {
@@ -167,8 +172,42 @@ export const logout = (req, res) => {
 };
 
 
-export const getProfile = (req, res) => {
-    res.json({
-        message: 'obteniendo perfil'
-    });
+export const getProfile = async (req, res) => {
+
+    try {
+
+        const result = await pool.query(
+            `
+            SELECT
+                id,
+                nombre,
+                apellido,
+                mail
+            FROM usuarios
+            WHERE id = $1
+            `,
+            [req.userId]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                error: 'Usuario no encontrado'
+            });
+        }
+
+        return res.status(200).json({
+            usuario: result.rows[0]
+        });
+
+    } catch (error) {
+
+        console.error(
+            'Error al obtener el perfil:',
+            error
+        );
+
+        return res.status(500).json({
+            error: 'Error al obtener el perfil'
+        });
+    }
 };
