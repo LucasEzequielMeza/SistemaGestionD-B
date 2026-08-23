@@ -1,5 +1,6 @@
 import React, {createContext, useState, useContext, useEffect, useRef} from 'react';
 import axios from "../Api/axios.js";
+import { useNavigate } from 'react-router-dom';
 
 export const ContextoAutorizacion = createContext();
 
@@ -24,9 +25,11 @@ export function AuthProvider({ children }) {
     const [erroresBackEnd, setErroresBackEnd] = useState(null);
     const [cargando, setCargando] = useState(true);
 
+    const navigate = useNavigate();
+
     const temporizadorError = useRef(null)
 
-        const mostrarError = (error) => {
+    const mostrarError = (error) => {
 
         if (temporizadorError.current) { 
 
@@ -185,6 +188,7 @@ export function AuthProvider({ children }) {
             setUsuario(null);
             setEstaAutorizado(false);
             setErroresBackEnd(null);
+            navigate('/iniciar-sesion');
         }
     };
 
