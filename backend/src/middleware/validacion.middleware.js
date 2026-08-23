@@ -1,12 +1,32 @@
-export const validateSchema = (schema) => async (req, res, next) => {
-  try {
-    await schema.parse(req.body);
-    next();
-  } catch (error) {
-    if (Array.isArray(error.errors)) {
-      return res.status(400).json(error.errors.map(error => error.message));
-    }
+export const validateSchema = (schema) => {
 
-    return res.status(400).json({ message: error.message });
-  }
+    return (req, res, next) => {
+
+        const resultado = schema.safeParse(req.body);
+
+        if (!resultado.success) {
+
+            const errores = {};
+
+            resultado.error.issues.forEach((error) => {
+
+                const campo = error.path[0];
+
+                if (!errores[campo]) {
+                    errores[campo] = [];
+                }
+
+                errores[campo].push(error.message);
+            });
+
+            return res.status(400).json({
+                message: 'Error de validación',
+                errors: errores
+            });
+        }
+
+        req.body = resultado.data;
+
+        next();
+    };
 };

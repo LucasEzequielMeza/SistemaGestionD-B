@@ -29,6 +29,22 @@ function RegisterPage() {
     <div className='h-[calc(100vh-8rem)] flex items-center justify-center'>
       <Card>
         <h1 className='text-2xl font-bold text-white flex items-center justify-center'>Registro</h1>
+
+        {erroresBackEnd?.length > 0 && (
+          <div className="mt-4 mb-4 rounded-md bg-red-500/10 border border-red-500 p-3">
+
+            {erroresBackEnd.map((error, index) => (
+              <p
+                key={index}
+                className="text-red-500 text-sm text-center"
+              >
+                {error}
+              </p>
+            ))}
+
+          </div>
+        )}
+
         <form onSubmit={onSubmit}>
 
           <Label htmlFor="nombre">Nombre</Label>

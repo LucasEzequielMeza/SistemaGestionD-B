@@ -1,10 +1,4 @@
-import React, {
-    createContext,
-    useState,
-    useContext,
-    useEffect
-} from 'react';
-
+import React, {createContext, useState, useContext, useEffect, useRef} from 'react';
 import axios from "../Api/axios.js";
 
 export const ContextoAutorizacion = createContext();
@@ -29,6 +23,43 @@ export function AuthProvider({ children }) {
     const [estaAutorizado, setEstaAutorizado] = useState(false);
     const [erroresBackEnd, setErroresBackEnd] = useState(null);
     const [cargando, setCargando] = useState(true);
+
+    const temporizadorError = useRef(null)
+
+        const mostrarError = (error) => {
+
+        if (temporizadorError.current) { 
+
+            clearTimeout(temporizadorError.current); 
+
+        }
+
+        const errores = error.response?.data?.errors;
+
+        if (errores) {
+
+            const mensajes = Object.values(errores).flat();
+
+            setErroresBackEnd(mensajes);
+
+        } else {
+
+            setErroresBackEnd([
+                error.response?.data?.error ||
+                error.response?.data?.message ||
+                error.message ||
+                'Error desconocido'
+            ]);
+        }
+
+        temporizadorError.current = setTimeout(() => { 
+            
+            setErroresBackEnd(null); 
+            
+            temporizadorError.current = null;
+
+        }, 8000);
+    };
 
 
     // Verificar sesión al cargar la aplicación
@@ -95,11 +126,7 @@ export function AuthProvider({ children }) {
                 error
             );
 
-            setErroresBackEnd([
-                error.response?.data?.error ||
-                error.message ||
-                'Error desconocido'
-            ]);
+            mostrarError(error);
 
             return null;
         }
@@ -135,11 +162,7 @@ export function AuthProvider({ children }) {
                 error
             );
 
-            setErroresBackEnd([
-                error.response?.data?.error ||
-                error.message ||
-                'Error desconocido'
-            ]);
+            mostrarError();
 
             return null;
         }
