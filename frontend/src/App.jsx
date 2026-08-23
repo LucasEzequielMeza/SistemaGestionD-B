@@ -9,6 +9,7 @@ import TramiteDetalle from "./Components/tramites/TramiteDetalle"
 import RecordatoriosForm from "./Components/recordatorios/RecordatorioForm"
 import Navbar from "./Components/navbar/Navbar"
 import Container from "./Components/UI/Container"
+import RutaProtegida from "./Components/autorizacion/RutaProtegida"
 
 function App() {
   return (
@@ -28,22 +29,24 @@ function App() {
             path="/register"
             element={<Navigate to="/registro" replace />}
           />
+          
+          <Route element={<RutaProtegida/>}>
+            {/* Trámites */}
+            <Route path="/tramites" element={<TramitesPage />} />
+            <Route path="/tramite/nuevo" element={<TramiteForm />} />
+            <Route path="/tramite/:id/edit" element={<TramiteForm />} />
+            <Route path="/tramites/detalle/:id" element={<TramiteDetalle />} />
 
-          {/* Trámites */}
-          <Route path="/tramites" element={<TramitesPage />} />
-          <Route path="/tramite/nuevo" element={<TramiteForm />} />
-          <Route path="/tramite/:id/edit" element={<TramiteForm />} />
-          <Route path="/tramites/detalle/:id" element={<TramiteDetalle />} />
+            {/* Recordatorios */}
+            <Route path="/recordatorios" element={<RecordatoriosPage />} />
+            <Route path="/recordatorios/nuevo" element={<RecordatoriosForm />} />
 
-          {/* Recordatorios */}
-          <Route path="/recordatorios" element={<RecordatoriosPage />} />
-          <Route path="/recordatorios/nuevo" element={<RecordatoriosForm />} />
-
-          {/* Ruta inexistente */}
-          <Route
-            path="*"
-            element={<Navigate to="/tramites" replace />}
-          />
+            {/* Ruta inexistente */}
+            <Route
+              path="*"
+              element={<Navigate to="/tramites" replace />}
+            />
+          </Route>
 
         </Routes>
       </Container>
