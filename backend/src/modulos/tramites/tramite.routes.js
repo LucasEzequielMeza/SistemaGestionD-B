@@ -3,12 +3,16 @@ import { Router } from "express";
 
 import {
     obtenerTramites,
+    obtenerTramitePorId,
     buscarTramites,
+    obtenerTipoTramite,
     crearTramite,
     actualizarTramite,
     darDeBajaTramite,
     enviarAReactivarTramite,
-    reactivarTramite
+    reactivarTramite,
+    obtenerTramitesPorEstado,
+    reactivarTramiteEnviadoABaja
 } from "./tramite.controller.js";
 
 import { estaAutenticado } from "../../middleware/autenticacion.middleware.js";
@@ -19,11 +23,19 @@ router.get('/', estaAutenticado(), obtenerTramites);
 
 router.get('/buscar', estaAutenticado(), buscarTramites);
 
+router.get('/tipos-tramite', estaAutenticado(), obtenerTipoTramite);
+
+router.get('/estado/:estado', estaAutenticado(), obtenerTramitesPorEstado);
+
+router.get('/:id', estaAutenticado(), obtenerTramitePorId);
+
 router.post('/', estaAutenticado(), crearTramite);
 
 router.put('/:id', estaAutenticado(), actualizarTramite);
 
 router.put('/:id/baja', estaAutenticado(), darDeBajaTramite);
+
+router.put('/:id/reactivar-baja', estaAutenticado(), reactivarTramiteEnviadoABaja);
 
 router.put('/:id/enviar-reactivar', estaAutenticado(), enviarAReactivarTramite);
 

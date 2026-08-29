@@ -4,7 +4,8 @@ import {
     obtenerDocumentosPorTramite,
     actualizarDocumentoTramite,
     marcarDocumentoRecibido,
-    marcarDocumentoCargadoLex
+    marcarDocumentoCargadoLex,
+    marcarDocumentoPendiente
 } from "./documentos.controller.js";
 
 
@@ -20,6 +21,10 @@ router.put(
     actualizarDocumentoTramite
 );
 
+router.put(
+    '/tramite-documento/:id/pendiente',
+    marcarDocumentoPendiente
+);
 router.put(
     '/tramite-documento/:id/recibido',
     marcarDocumentoRecibido

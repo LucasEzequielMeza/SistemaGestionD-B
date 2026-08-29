@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { FaFolder } from "react-icons/fa6";
 import { IoIosNotifications } from "react-icons/io";
 import { IoLogOut } from "react-icons/io5";
@@ -7,13 +7,11 @@ import { Link, useLocation } from 'react-router-dom'
 import { privateRoutes } from './navegacion.js'
 import { useAuth } from '../../Context/ContextoAutorizacion'
 
-function NavBar() {
+function NavBar({ menuAbierto, setMenuAbierto }) {
 
     const location = useLocation()
 
     const { logout, usuario, estaAutorizado } = useAuth()
-
-    const [menuAbierto, setMenuAbierto] = useState(true)
 
     if (!estaAutorizado) {
         return null
