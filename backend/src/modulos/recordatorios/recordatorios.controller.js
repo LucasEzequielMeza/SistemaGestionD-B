@@ -7,13 +7,48 @@ export const obtenerRecordatorios = async (req, res) => {
 
             FROM recordatorios
 
-            WHERE user_id = $1`, [req.userId]);
+            WHERE user_id = $1
+            AND completado = false`
+            ,[req.userId]);
 
         return res.status(200).json(result.rows);
 
     } catch (error) {
         console.error('Error al obtener los recordatorios:', error);
         res.status(500).json({ error: 'Error al obtener los recordatorios' });
+    }
+}
+
+export const obtenerRecordatorioPorId = async (req, res) => {
+    const {id} = req.params
+
+    try {
+        const result = await pool.query(`
+        SELECT 
+        id, 
+        descripcion, 
+        fecha_evento,
+        hora_evento,
+        minutos_antes,
+        completado
+
+        FROM recordatorios
+        WHERE recordatorios.id = $1 
+        AND user_id = $2
+        `, [id, req.userId])
+
+    
+        if (result.rows.length === 0) {
+        return res.status(404).json({
+            error: 'Recordatorio no encontrado'
+        })
+    }    
+
+        return res.json(result.rows[0])
+    } catch (error) {
+        return res.status(500).json({
+            error: "Error al obtener el recordatorio"
+        });
     }
 }
 

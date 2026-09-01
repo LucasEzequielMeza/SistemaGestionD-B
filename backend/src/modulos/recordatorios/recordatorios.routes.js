@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import {
     obtenerRecordatorios,
+    obtenerRecordatorioPorId,
     crearRecordatorio,
     actualizarRecordatorio,
     eliminarRecordatorio,
@@ -15,6 +16,8 @@ const router = Router();
 
 // Obtengo los recordatorios del usuario autenticado
 router.get("/", estaAutenticado(), obtenerRecordatorios);
+
+router.get("/:id", estaAutenticado(), obtenerRecordatorioPorId);
 
 // Creo un nuevo recordatorio
 router.post("/", estaAutenticado(), crearRecordatorio);
