@@ -23,6 +23,10 @@ export const privateRoutes = [
         name: 'Trámites a reactivar',
         path: '/tramites/reactivar'
     },
+    {
+        name: 'Trámites finalizados',
+        path: '/tramites/finalizados'
+    },
 
     {
         name: 'Trámites dados de baja',

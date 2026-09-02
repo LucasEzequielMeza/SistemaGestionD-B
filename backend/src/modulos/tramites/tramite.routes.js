@@ -11,6 +11,7 @@ import {
     darDeBajaTramite,
     enviarAReactivarTramite,
     reactivarTramite,
+    finalizarTramite,
     obtenerTramitesPorEstado,
     reactivarTramiteEnviadoABaja
 } from "./tramite.controller.js";
@@ -40,6 +41,8 @@ router.put('/:id/reactivar-baja', estaAutenticado(), reactivarTramiteEnviadoABaj
 router.put('/:id/enviar-reactivar', estaAutenticado(), enviarAReactivarTramite);
 
 router.put('/:id/reactivar', estaAutenticado(), reactivarTramite);
+
+router.put('/:id/finalizar', estaAutenticado(), finalizarTramite);
 
 
 export default router;

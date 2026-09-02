@@ -537,6 +537,46 @@ export const reactivarTramite = async (req, res) => {
     }
 };
 
+export const finalizarTramite = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await pool.query(`
+            UPDATE tramites
+            SET estado = 'finalizado',
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = $1
+            AND user_id = $2
+            AND estado = 'en_proceso'
+            AND NOT EXISTS (
+                SELECT 1
+                FROM tramite_documentos
+                WHERE tramite_documentos.tramite_id = tramites.id
+                AND tramite_documentos.estado NOT IN ('recibido', 'cargado')
+            )
+            RETURNING *
+        `, [
+            id,
+            req.userId
+        ]);
+
+        if (result.rows.length === 0) {
+            return res.status(400).json({
+                message: "El trámite no puede finalizarse porque no está completo"
+            });
+        }
+
+        return res.json(result.rows[0]);
+
+    } catch (error) {
+        console.error("Error al finalizar el trámite:", error);
+
+        return res.status(500).json({
+            error: "Error al finalizar el trámite"
+        });
+    }
+};
+
 export const reactivarTramiteEnviadoABaja = async (req, res) => {
 
     // Obtenemos el ID del trámite desde la URL

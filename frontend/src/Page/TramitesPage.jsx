@@ -9,7 +9,8 @@ function TramitesPage() {
         tramites,
         obtenerTramites,
         tramiteError,
-        enviarReactivarTramite
+        enviarReactivarTramite, 
+        finalizarTramite
     } = useTramite()
 
     const navigate = useNavigate()
@@ -21,6 +22,15 @@ function TramitesPage() {
     const enviarTramiteAReactivar = async (id) => {
 
         const respuesta = await enviarReactivarTramite(id)
+
+        if (respuesta) {
+            obtenerTramites()
+        }
+    }
+
+    const tramiteFinalizado = async (id) => {
+        
+        const respuesta = await finalizarTramite(id)
 
         if (respuesta) {
             obtenerTramites()
@@ -58,6 +68,7 @@ function TramitesPage() {
                             key={tramite.id}
                             tramite={tramite}
                             enviarAReactivar={enviarTramiteAReactivar}
+                            finalizarTramite={tramiteFinalizado}
                         />
                     ))}
                 </div>

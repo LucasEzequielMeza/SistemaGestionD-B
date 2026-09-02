@@ -121,6 +121,17 @@ export function TramiteProvider({ children }) {
         }
     }
 
+    const finalizarTramite = async (id, data) => {
+        try {
+            const respuesta = await axios.put(`/tramites/${id}/finalizar`, data);
+            return respuesta.data
+        } catch (error) {
+            if (error.response) {
+                setTramiteError([error.response.data])
+            }
+        }
+    }
+
     const reactivarTramiteEnBaja = async (id, data) => {
         try {
             const respuesta = await axios.put(`/tramites/${id}/reactivar-baja`, data);
@@ -169,6 +180,7 @@ export function TramiteProvider({ children }) {
                 actualizarTramite,
                 enviarReactivarTramite,
                 reactivarTramite,
+                finalizarTramite,
                 darDeBajaTramite,
                 obtenerTramitesPorEstado,
                 reactivarTramiteEnBaja

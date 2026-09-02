@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom"
 import LoginPage from "./Page/LoginPage"
 import RegisterPage from "./Page/RegisterPage"
 import TramitesPage from "./Page/TramitesPage"
+import TramitesFinalizadosPage from "./Page/TramitesFinalizadosPage"
 import TramitesReactivarPage from "./Page/TramitesReactivarPage"
 import TramitesBajaPage from "./Page/TramitesBajaPage"
 import RecordatoriosPage from "./Page/RecordatoriosPage"
@@ -50,6 +51,7 @@ function App() {
             <Route element={<RutaProtegida/>}>
               {/* Trámites */}
               <Route path="/tramites" element={<TramitesPage />} />
+              <Route path="/tramites/finalizados" element={<TramitesFinalizadosPage/>}/>
               <Route path="/tramites/reactivar" element={<TramitesReactivarPage />} />
               <Route path="/tramites/baja" element={<TramitesBajaPage />} />
               
