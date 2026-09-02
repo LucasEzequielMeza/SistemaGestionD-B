@@ -20,7 +20,10 @@ export const obtenerRecordatorios = async (req, res) => {
 }
 
 export const obtenerRecordatorioPorId = async (req, res) => {
-    const {id} = req.params
+    const { id } = req.params
+
+    console.log("ID recibido:", id);
+    console.log("Usuario recibido:", req.userId);
 
     try {
         const result = await pool.query(`
@@ -31,18 +34,16 @@ export const obtenerRecordatorioPorId = async (req, res) => {
         hora_evento,
         minutos_antes,
         completado
-
         FROM recordatorios
         WHERE recordatorios.id = $1 
         AND user_id = $2
         `, [id, req.userId])
 
-    
         if (result.rows.length === 0) {
-        return res.status(404).json({
-            error: 'Recordatorio no encontrado'
-        })
-    }    
+            return res.status(404).json({
+                error: 'Recordatorio no encontrado'
+            })
+        }
 
         return res.json(result.rows[0])
     } catch (error) {

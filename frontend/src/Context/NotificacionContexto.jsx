@@ -1,0 +1,165 @@
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react'
+import { useRecordatorio } from './RecordatorioContexto'
+
+export const NotificacionContexto = createContext();
+
+export const useNotificacion = () => {
+    const context = useContext(NotificacionContexto);
+
+    if (!context) {
+        throw new Error("useNotificacion debe utilizarse dentro del NotificacionProvider");
+    }
+
+    return context;
+}
+
+export function NotificacionProvider({ children }) {
+    const { recordatorios, obtenerRecordatorios } = useRecordatorio();
+    const [notificaciones, setNotificaciones] = useState([]);
+
+    // Guardo cuándo notifiqué cada recordatorio para no repetirlo al actualizar la página.
+    const recordatoriosNotificados = useRef(
+        JSON.parse(localStorage.getItem('recordatoriosNotificados') || '{}')
+    );
+
+    useEffect(() => {
+        // Obtengo los recordatorios al iniciar la aplicación.
+        obtenerRecordatorios();
+
+        // Vuelvo a consultar cada 10 segundos para detectar nuevos recordatorios.
+        const intervalo = setInterval(() => {
+            obtenerRecordatorios();
+        }, 10000);
+
+        return () => clearInterval(intervalo);
+    }, []);
+
+    useEffect(() => {
+        const ahora = new Date();
+
+        const recordatoriosParaNotificar = recordatorios
+            .map((recordatorio) => {
+                if (recordatorio.completado) {
+                    return null;
+                }
+
+                // Armo la fecha y hora en la que ocurre el recordatorio.
+                const fecha = new Date(recordatorio.fecha_evento);
+                const [hora, minutos] = recordatorio.hora_evento.split(':').map(Number);
+
+                fecha.setHours(hora);
+                fecha.setMinutes(minutos);
+                fecha.setSeconds(0);
+                fecha.setMilliseconds(0);
+
+                // Calculo cuándo tiene que aparecer la notificación.
+                const tiempoNotificacion = new Date(fecha);
+                tiempoNotificacion.setMinutes(
+                    tiempoNotificacion.getMinutes() - Number(recordatorio.minutos_antes)
+                );
+
+                const tiempoNotificacionActual = tiempoNotificacion.getTime();
+                const fechaNotificacionAnterior = recordatoriosNotificados.current[recordatorio.id];
+
+                // Si ya notifiqué este recordatorio para esta fecha y hora, no lo vuelvo a mostrar.
+                if (fechaNotificacionAnterior === tiempoNotificacionActual) {
+                    return null;
+                }
+
+                const diferencia = ahora.getTime() - tiempoNotificacionActual;
+
+                // Solo notifico durante los primeros 30 segundos desde la hora indicada.
+                if (diferencia >= 0 && diferencia <= 30000) {
+                    return {
+                        recordatorio,
+                        tiempoNotificacionActual
+                    };
+                }
+
+                return null;
+            })
+            .filter(Boolean);
+
+        if (recordatoriosParaNotificar.length === 0) {
+            return;
+        }
+
+        setNotificaciones((notificacionesActuales) => [
+            ...notificacionesActuales,
+            ...recordatoriosParaNotificar.map(({ recordatorio }) => recordatorio)
+        ]);
+
+        recordatoriosParaNotificar.forEach(({ recordatorio, tiempoNotificacionActual }) => {
+            // Guardo cuándo lo notifiqué para no volver a mostrarlo al actualizar la página.
+            recordatoriosNotificados.current[recordatorio.id] = tiempoNotificacionActual;
+
+            localStorage.setItem(
+                'recordatoriosNotificados',
+                JSON.stringify(recordatoriosNotificados.current)
+            );
+
+            // Muestro también la notificación nativa del navegador.
+            mostrarNotificacionNativa(recordatorio);
+        });
+    }, [recordatorios]);
+
+    // Muestro en el título cuántas notificaciones tengo pendientes.
+    useEffect(() => {
+        document.title = notificaciones.length > 0
+            ? `(${notificaciones.length}) Sistema D&B`
+            : 'Sistema D&B';
+    }, [notificaciones.length]);
+
+    const quitarNotificacion = (id) => {
+        setNotificaciones((notificacionesActuales) =>
+            notificacionesActuales.filter(
+                (notificacion) => notificacion.id !== id
+            )
+        );
+    };
+
+    const solicitarPermisoNotificaciones = async () => {
+        if (!("Notification" in window)) {
+            return false;
+        }
+
+        const permiso = await Notification.requestPermission();
+        return permiso === "granted";
+    };
+
+    const mostrarNotificacionNativa = async (recordatorio) => {
+        if (!("Notification" in window)) {
+            return;
+        }
+
+        if (Notification.permission !== "granted") {
+            return;
+        }
+
+        try {
+            // Espero a que el Service Worker esté disponible.
+            const registro = await navigator.serviceWorker.ready;
+
+            // Le pido al Service Worker que muestre la notificación nativa.
+            await registro.showNotification("Sistema D&B", {
+                body: recordatorio.descripcion,
+                tag: recordatorio.id,
+                data: {
+                    id: recordatorio.id
+                }
+            });
+        } catch (error) {
+            console.error('Error al mostrar la notificación nativa:', error);
+        }
+    };
+
+    return (
+        <NotificacionContexto.Provider value={{
+            notificaciones,
+            quitarNotificacion,
+            solicitarPermisoNotificaciones
+        }}>
+            {children}
+        </NotificacionContexto.Provider>
+    );
+}

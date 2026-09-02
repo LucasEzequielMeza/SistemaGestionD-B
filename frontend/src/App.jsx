@@ -9,9 +9,11 @@ import RecordatoriosPage from "./Page/RecordatoriosPage"
 import TramiteForm from "./Components/tramites/TramiteForm"
 import TramiteDetalle from "./Components/tramites/TramiteDetalle"
 import RecordatorioForm from "./Components/recordatorios/RecordatorioForm"
+import RecordatorioDetalle from "./Components/recordatorios/RecordatorioDetalle"
 import Navbar from "./Components/navbar/Navbar"
 import Container from "./Components/UI/Container"
 import RutaProtegida from "./Components/autorizacion/RutaProtegida"
+import Notificaciones from "./Components/notificaciones/Notificaciones"
 
 function App() {
 
@@ -57,6 +59,7 @@ function App() {
 
               {/* Recordatorios */}
               <Route path="/recordatorios" element={<RecordatoriosPage />} />
+              <Route path="/recordatorios/:id" element={<RecordatorioDetalle/>}/>
               <Route path="/recordatorios/nuevo" element={<RecordatorioForm />} />
               <Route path="/recordatorios/:id/edit" element={<RecordatorioForm/>}/>
 
@@ -70,6 +73,7 @@ function App() {
           </Routes>
         </Container>
       </main>
+      <Notificaciones/>
     </>
   )
 }
