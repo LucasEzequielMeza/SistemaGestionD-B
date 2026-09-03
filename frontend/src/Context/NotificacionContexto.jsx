@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { useRecordatorio } from './RecordatorioContexto'
+import { useAuth } from './ContextoAutorizacion'
 
 export const NotificacionContexto = createContext();
 
@@ -16,6 +17,7 @@ export const useNotificacion = () => {
 export function NotificacionProvider({ children }) {
     const { recordatorios, obtenerRecordatorios } = useRecordatorio();
     const [notificaciones, setNotificaciones] = useState([]);
+    const { estaAutorizado, cargando } = useAuth();
 
     // Guardo cuándo notifiqué cada recordatorio para no repetirlo al actualizar la página.
     const recordatoriosNotificados = useRef(
@@ -23,6 +25,11 @@ export function NotificacionProvider({ children }) {
     );
 
     useEffect(() => {
+        // Espero a que termine de verificarse la sesión y solamente continúo si estoy autenticado
+        if (cargando || !estaAutorizado) {
+            return;
+        }
+
         // Obtengo los recordatorios al iniciar la aplicación.
         obtenerRecordatorios();
 
@@ -32,7 +39,7 @@ export function NotificacionProvider({ children }) {
         }, 10000);
 
         return () => clearInterval(intervalo);
-    }, []);
+    }, [cargando, estaAutorizado]);
 
     useEffect(() => {
         const ahora = new Date();

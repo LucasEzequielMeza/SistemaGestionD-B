@@ -1,9 +1,12 @@
 import React, {useEffect} from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../Context/ContextoAutorizacion.jsx'
 import { useRecordatorio } from '../Context/RecordatorioContexto'
 import RecordatorioCard from '../Components/recordatorios/RecordatorioCard'
 
 function RecordatoriosPage() {
+
+  const { estaAutorizado, cargando } = useAuth();
 
   const {
     recordatorios,
@@ -16,8 +19,10 @@ function RecordatoriosPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    obtenerRecordatorios()
-  }, [])
+      if (!cargando && estaAutorizado) {
+          obtenerRecordatorios()
+      }
+  }, [cargando, estaAutorizado])
 
   const darPorFinalizadoRecordatorio = async (id) => {
     const respuesta = await finalizarRecordatorio(id)

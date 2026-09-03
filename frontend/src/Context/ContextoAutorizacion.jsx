@@ -137,35 +137,29 @@ export function AuthProvider({ children }) {
 
     const login = async (data) => {
         try {
-
             setErroresBackEnd(null);
 
-            const response = await axios.post(
-                '/login',
-                data
-            );
+            // Inicio sesión y obtengo la cookie de autenticación
+            const response = await axios.post('/login', data);
 
             const { usuario } = response.data;
 
             if (!usuario) {
-                throw new Error(
-                    'No se recibió correctamente el usuario'
-                );
+                throw new Error('No se recibió correctamente el usuario');
             }
 
-            setUsuario(usuario);
+            // Obtengo el perfil completo del usuario
+            const perfil = await axios.get('/profile');
+
+            setUsuario(perfil.data.usuario);
             setEstaAutorizado(true);
 
-            return usuario;
+            return perfil.data.usuario;
 
         } catch (error) {
+            console.error('Error al iniciar sesión:', error);
 
-            console.error(
-                'Error al iniciar sesión:',
-                error
-            );
-
-            mostrarError();
+            mostrarError(error);
 
             return null;
         }
