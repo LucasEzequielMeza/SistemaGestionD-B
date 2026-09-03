@@ -733,3 +733,47 @@ export const obtenerTramitesPorEstado = async (req, res) => {
         });
     }
 };
+
+export const obtenerResumenDashboard = async (req, res) => {
+
+    try {
+
+        // Obtengo la cantidad de trámites activos, finalizados, de baja y en reactivar
+        const tramites = await pool.query(`
+            SELECT
+                COUNT(*) FILTER (WHERE estado = 'en_proceso') AS tramites_activos,
+                COUNT(*) FILTER (WHERE estado = 'finalizado') AS tramites_completos,
+                COUNT(*) FILTER (WHERE estado = 'baja') AS tramites_baja,
+                COUNT(*) FILTER (WHERE estado = 'reactivar') AS tramites_reactivar
+            FROM tramites
+            WHERE user_id = $1
+        `, [req.userId]);
+
+        // Obtengo la cantidad de documentación que todavía está pendiente
+        const documentos = await pool.query(`
+            SELECT COUNT(*) AS documentacion_pendiente
+            FROM tramite_documentos
+            INNER JOIN tramites
+                ON tramite_documentos.tramite_id = tramites.id
+            WHERE tramites.user_id = $1
+            AND tramites.estado = 'en_proceso'
+            AND tramite_documentos.estado NOT IN ('recibido', 'cargado')
+        `, [req.userId]);
+
+        return res.json({
+            tramites_activos: Number(tramites.rows[0].tramites_activos),
+            tramites_completos: Number(tramites.rows[0].tramites_completos),
+            documentacion_pendiente: Number(documentos.rows[0].documentacion_pendiente),
+            tramites_baja: Number(tramites.rows[0].tramites_baja),
+            tramites_reactivar: Number(tramites.rows[0].tramites_reactivar)
+        });
+
+    } catch (error) {
+
+        console.error("Error al obtener el resumen del dashboard:", error);
+
+        return res.status(500).json({
+            error: "Error al obtener el resumen del dashboard"
+        });
+    }
+};

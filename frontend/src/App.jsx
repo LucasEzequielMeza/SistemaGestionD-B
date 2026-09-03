@@ -11,6 +11,7 @@ import TramiteForm from "./Components/tramites/TramiteForm"
 import TramiteDetalle from "./Components/tramites/TramiteDetalle"
 import RecordatorioForm from "./Components/recordatorios/RecordatorioForm"
 import RecordatorioDetalle from "./Components/recordatorios/RecordatorioDetalle"
+import DashboardPage from "./Page/DashboardPage"
 import Navbar from "./Components/navbar/Navbar"
 import Container from "./Components/UI/Container"
 import RutaProtegida from "./Components/autorizacion/RutaProtegida"
@@ -50,6 +51,7 @@ function App() {
             
             <Route element={<RutaProtegida/>}>
               {/* Trámites */}
+              <Route path="/tramites/dashboard" element={<DashboardPage/>}/>
               <Route path="/tramites" element={<TramitesPage />} />
               <Route path="/tramites/finalizados" element={<TramitesFinalizadosPage/>}/>
               <Route path="/tramites/reactivar" element={<TramitesReactivarPage />} />

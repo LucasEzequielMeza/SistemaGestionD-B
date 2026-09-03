@@ -10,9 +10,15 @@ import {useTramite} from '../../Context/TramiteContexto'
 
 function TramiteForm() {
 
-  const {register, handleSubmit, formState: {errors}, setValue, watch} = useForm();
+  const {register, handleSubmit, formState: {errors}, setValue, watch} = useForm({
+    defaultValues: {
+        tipo_tramite_id: ""
+    }
+  });
 
   const [tiposTramite, setTiposTramite] = useState([])
+
+  const [errorNumeroCarpeta, setErrorNumeroCarpeta] = useState("");
 
   const navigate = useNavigate();
 
@@ -23,12 +29,17 @@ function TramiteForm() {
     crearTramite,
     obtenerTramitePorId,
     tramiteError,
-    obtenerTiposTramite
+    obtenerTiposTramite,
+    limpiarTramiteError
   } = useTramite();
 
   const params = useParams();
 
   const onSubmit = handleSubmit(async (data) =>{
+
+    limpiarTramiteError();
+    setErrorNumeroCarpeta("");
+
     let respuesta;
 
     if (params.id) {
@@ -55,18 +66,39 @@ function TramiteForm() {
   useEffect(() => {
       obtenerTiposTramite().then((data) => {
           setTiposTramite(data);
+
+          if (!params.id) {
+
+            const tipoLES = data.find((tipo) => tipo.codigo === "LES");
+
+            if (tipoLES) {
+                setValue("tipo_tramite_id", tipoLES.id);
+            }
+          }  
       });
   }, []);
+
+  useEffect(() => {
+
+    if (tramiteError.length > 0) {
+
+        setErrorNumeroCarpeta(
+            tramiteError[0].error || tramiteError[0].message || tramiteError[0]
+        );
+
+        const temporizador = setTimeout(() => {
+            setErrorNumeroCarpeta("");
+        }, 10000);
+
+        return () => clearTimeout(temporizador);
+    }
+
+  }, [tramiteError]);
 
 
   return (
     <div>
       <Card>
-        {tramiteError.map((error, i) => (
-          <p key={i} className='text-red-500'>
-              {error.message || error.error || error}
-          </p>
-        ))}
         <h2 className='text-3xl font-bold text-white my-4 flex items-center justify-center'>
           {params.id ? "Editar tramite" : "Crear tramite"}
         </h2>
@@ -89,6 +121,11 @@ function TramiteForm() {
               </p>
           )}
           <Label htmlFor="numero_carpeta">Numero de carpeta</Label>
+          {errorNumeroCarpeta && (
+              <p className="text-red-500">
+                  {errorNumeroCarpeta}
+              </p>
+          )}
           <Input type="text" {...register('numero_carpeta', { required: true })} />
           {errors.numero_carpeta && (
             <p className='text-red-500'>El numero de carpeta es requerido</p>

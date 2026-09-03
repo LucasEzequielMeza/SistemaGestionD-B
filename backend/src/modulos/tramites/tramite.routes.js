@@ -13,7 +13,8 @@ import {
     reactivarTramite,
     finalizarTramite,
     obtenerTramitesPorEstado,
-    reactivarTramiteEnviadoABaja
+    reactivarTramiteEnviadoABaja,
+    obtenerResumenDashboard
 } from "./tramite.controller.js";
 
 import { estaAutenticado } from "../../middleware/autenticacion.middleware.js";
@@ -25,6 +26,8 @@ router.get('/', estaAutenticado(), obtenerTramites);
 router.get('/buscar', estaAutenticado(), buscarTramites);
 
 router.get('/tipos-tramite', estaAutenticado(), obtenerTipoTramite);
+
+router.get('/dashboard', estaAutenticado(), obtenerResumenDashboard);
 
 router.get('/estado/:estado', estaAutenticado(), obtenerTramitesPorEstado);
 

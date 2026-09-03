@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { FaFolder } from "react-icons/fa6";
-import { IoIosNotifications } from "react-icons/io";
 import { IoLogOut } from "react-icons/io5";
 import { IoMenu } from "react-icons/io5";
 import { Link, useLocation } from 'react-router-dom'
@@ -54,26 +52,38 @@ function NavBar({ menuAbierto, setMenuAbierto }) {
                         >
                             {menuAbierto ? (
                                 <div className="flex items-center justify-between w-full">
-                                    <span>{route.name}</span>
-                                    {!route.path.startsWith('/tramite') && notificaciones.length > 0 && (
+
+                                    <div className="flex items-center gap-3">
+
+                                        {route.icon && <route.icon className="text-xl" />}
+
+                                        <span>{route.name}</span>
+
+                                    </div>
+
+                                    {route.path === '/recordatorios' && notificaciones.length > 0 && (
                                         <span className="bg-red-500 text-white text-xs font-bold rounded-full min-w-5 h-5 flex items-center justify-center px-1">
                                             {notificaciones.length}
                                         </span>
                                     )}
+
                                 </div>
                             ) : (
-                                route.path.startsWith('/tramite') ? (
-                                    <FaFolder className="text-xl" />
-                                ) : (
-                                    <div className="relative">
+                                <div className="relative">
+
+                                    {route.icon ? (
+                                        <route.icon className="text-xl" />
+                                    ) : (
                                         <IoIosNotifications className="text-xl" />
-                                        {notificaciones.length > 0 && (
-                                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full min-w-5 h-5 flex items-center justify-center px-1">
-                                                {notificaciones.length}
-                                            </span>
-                                        )}
-                                    </div>
-                                )
+                                    )}
+
+                                    {route.path === '/recordatorios' && notificaciones.length > 0 && (
+                                        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full min-w-5 h-5 flex items-center justify-center px-1">
+                                            {notificaciones.length}
+                                        </span>
+                                    )}
+
+                                </div>
                             )}
                         </Link>
                     ))}

@@ -84,6 +84,7 @@ export function TramiteProvider({ children }) {
             if (error.response) {
                 setTramiteError([error.response.data]);
             }
+            return null;
         }
     };
 
@@ -165,6 +166,22 @@ export function TramiteProvider({ children }) {
         }
     };
 
+    const obtenerResumenDashboard = async () => {
+        try {
+            const respuesta = await axios.get('/tramites/dashboard');
+            
+            return respuesta.data
+        } catch (error) {
+            if (error.response) {
+                setTramiteError([error.response.data]);
+            }
+        }
+    }
+
+    const limpiarTramiteError = () => {
+        setTramiteError([]);
+    };
+
 
     return (
         <TramiteContexto.Provider
@@ -183,7 +200,9 @@ export function TramiteProvider({ children }) {
                 finalizarTramite,
                 darDeBajaTramite,
                 obtenerTramitesPorEstado,
-                reactivarTramiteEnBaja
+                reactivarTramiteEnBaja,
+                obtenerResumenDashboard,
+                limpiarTramiteError
             }}
         >
             {children}
