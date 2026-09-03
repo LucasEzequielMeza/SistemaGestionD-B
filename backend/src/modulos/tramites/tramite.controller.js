@@ -115,19 +115,35 @@ export const buscarTramites = async (req, res) => {
 
     try {
 
+        // Buscamos los trámites del usuario junto con su tipo
+        // y la cantidad de documentación completa
         const result = await pool.query(`
 
-            -- Obtenemos los trámites del usuario autenticado
-            -- junto con el código de su tipo de trámite
-            SELECT 
+            SELECT
+
                 tramites.*,
-                tipos_tramite.codigo AS tipo_tramite
+
+                tipos_tramite.codigo AS tipo_tramite,
+
+                COUNT(tramite_documentos.id) AS documentos_total,
+
+                COUNT(
+                    CASE
+                        WHEN tramite_documentos.estado = 'recibido'
+                        OR tramite_documentos.estado = 'cargado'
+                        THEN 1
+                    END
+                ) AS documentos_completados
 
             FROM tramites
 
-            -- Unimos ambas tablas mediante el tipo de trámite
+            -- Unimos el trámite con su tipo
             INNER JOIN tipos_tramite
                 ON tramites.tipo_tramite_id = tipos_tramite.id
+
+            -- Obtenemos los documentos correspondientes al trámite
+            LEFT JOIN tramite_documentos
+                ON tramites.id = tramite_documentos.tramite_id
 
             -- Solamente buscamos trámites del usuario autenticado
             WHERE tramites.user_id = $1
@@ -140,10 +156,16 @@ export const buscarTramites = async (req, res) => {
                 OR LOWER(tramites.nombre_cliente) LIKE LOWER($3)
             )
 
+            GROUP BY
+                tramites.id,
+                tipos_tramite.codigo
+
         `, [
+
             req.userId,
             search,
             `%${search}%`
+
         ]);
 
         return res.json(result.rows);

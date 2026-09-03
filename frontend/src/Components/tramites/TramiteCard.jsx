@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Card from '../UI/Card'
 import Button from '../UI/Button'
 
-function TramiteCard({ tramite, enviarAReactivar, finalizarTramite }) {
+function TramiteCard({ tramite, enviarAReactivar, finalizarTramite, modoBusqueda }) {
     const navigate = useNavigate()
 
     return (
@@ -49,26 +49,37 @@ function TramiteCard({ tramite, enviarAReactivar, finalizarTramite }) {
                             Ver detalle
                     </Button>
 
-                    {tramite.estado !== 'finalizado' && (
-                        <Button
-                            onClick={() =>
-                                navigate(`/tramite/${tramite.id}/edit`)
-                            }
-                        >
-                            Editar
-                        </Button>
-                    )}
-
-                    {tramite.estado === 'en_proceso' && (
-                        tramite.documentos_completados === tramite.documentos_total ? (
-                            <Button onClick={() => finalizarTramite(tramite.id)}>
-                                Finalizar trámite
-                            </Button>
-                        ) : (
-                            <Button onClick={() => enviarAReactivar(tramite.id)}>
-                                Enviar a reactivar
-                            </Button>
-                        )
+                    {!modoBusqueda && (
+                        <>
+                            {tramite.estado !== 'finalizado' && (
+                                <Button
+                                    onClick={() =>
+                                        navigate(`/tramite/${tramite.id}/edit`)
+                                    }
+                                >
+                                    Editar
+                                </Button>
+                            )}
+                            {tramite.estado === 'en_proceso' && (
+                                tramite.documentos_completados === tramite.documentos_total ? (
+                                    <Button
+                                        onClick={() =>
+                                            finalizarTramite(tramite.id)
+                                        }
+                                    >
+                                        Finalizar trámite
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        onClick={() =>
+                                            enviarAReactivar(tramite.id)
+                                        }
+                                    >
+                                        Enviar a reactivar
+                                    </Button>
+                                )
+                            )}
+                        </>
                     )}
                 </div>
             </div>

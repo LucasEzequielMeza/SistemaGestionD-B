@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTramite } from '../Context/TramiteContexto'
 import TramiteCard from '../Components/tramites/TramiteCard'
@@ -10,10 +10,14 @@ function TramitesPage() {
         obtenerTramites,
         tramiteError,
         enviarReactivarTramite, 
-        finalizarTramite
+        finalizarTramite,
+        buscarTramite
     } = useTramite()
 
     const navigate = useNavigate()
+
+    const [busqueda, setBusqueda] = useState('')
+    const [resultadosBusqueda, setResultadosBusqueda] = useState([])
 
     useEffect(() => {
         obtenerTramites()
@@ -37,12 +41,41 @@ function TramitesPage() {
         }
     }
 
+    const realizarBusqueda = async (texto) => {
+
+        setBusqueda(texto)
+
+        if (texto.trim() === '') {
+            setResultadosBusqueda([])
+            obtenerTramites()
+            return
+        }
+
+        const resultados = await buscarTramite(texto)
+
+        if (resultados) {
+            setResultadosBusqueda(resultados)
+        }
+    }
+
+    const tramitesMostrar = busqueda.trim() === ''
+    ? tramites
+    : resultadosBusqueda
 
     return (
 
         <div>
             <div className="flex items-center justify-between my-6">
                 <h1 className="text-4xl text-black font-bold">Trámites</h1>
+                <div className="mb-6">
+                    <input
+                        type="text"
+                        placeholder="Buscar por número de carpeta o nombre del cliente"
+                        value={busqueda}
+                        onChange={(e) => realizarBusqueda(e.target.value)}
+                        className="bg-zinc-800 px-3 py-2 block w-full text-white rounded-md"
+                    />
+                </div>
 
                 <button onClick={() => navigate('/tramite/nuevo')} className="bg-[#5A1725] text-white px-4 py-2 rounded-md hover:bg-[#701D2D]">
                     Nuevo trámite
@@ -59,16 +92,17 @@ function TramitesPage() {
                 </div>
             )}
 
-            {tramites.length === 0 ? (
+            {tramitesMostrar.length === 0 ? (
                 <p className="text-gray-600">No hay trámites para mostrar.</p>
             ) : (
                 <div className="grid gap-4">
-                    {tramites.map((tramite) => (
+                    {tramitesMostrar.map((tramite) => (
                         <TramiteCard
                             key={tramite.id}
                             tramite={tramite}
                             enviarAReactivar={enviarTramiteAReactivar}
                             finalizarTramite={tramiteFinalizado}
+                            modoBusqueda={busqueda.trim() !== ''}
                         />
                     ))}
                 </div>

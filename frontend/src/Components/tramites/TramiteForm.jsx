@@ -63,7 +63,9 @@ function TramiteForm() {
     <div>
       <Card>
         {tramiteError.map((error, i) => (
-          <p key={i} className='text-red-500'>{error}</p>
+          <p key={i} className='text-red-500'>
+              {error.message || error.error || error}
+          </p>
         ))}
         <h2 className='text-3xl font-bold text-white my-4 flex items-center justify-center'>
           {params.id ? "Editar tramite" : "Crear tramite"}
