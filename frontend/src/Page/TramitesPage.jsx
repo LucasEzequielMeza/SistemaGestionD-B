@@ -63,52 +63,58 @@ function TramitesPage() {
     : resultadosBusqueda
 
     return (
+    <div>
 
-        <div>
-            <div className="flex items-center justify-between my-6">
-                <h1 className="text-4xl text-black font-bold">Trámites</h1>
-                <div className="mb-6">
-                    <input
-                        type="text"
-                        placeholder="Buscar por número de carpeta o nombre del cliente"
-                        value={busqueda}
-                        onChange={(e) => realizarBusqueda(e.target.value)}
-                        className="bg-zinc-800 px-3 py-2 block w-full text-white rounded-md"
-                    />
-                </div>
+        <div className="flex items-center gap-4 my-6">
+            <input
+                type="text"
+                placeholder="Buscar por número de carpeta o nombre del cliente"
+                value={busqueda}
+                onChange={(e) => realizarBusqueda(e.target.value)}
+                className="bg-[#5A1725] px-3 py-2 text-white rounded-md placeholder:text-white/60 focus:outline-none flex-1"
+            />
 
-                <button onClick={() => navigate('/tramite/nuevo')} className="bg-[#5A1725] text-white px-4 py-2 rounded-md hover:bg-[#701D2D]">
-                    Nuevo trámite
-                </button>
-            </div>
+            <button
+                onClick={() => navigate('/tramite/nuevo')}
+                className="bg-[#5A1725] text-white px-4 py-2 rounded-md hover:bg-[#701D2D] whitespace-nowrap"
+            >
+                Nuevo trámite
+            </button>
 
-            {tramiteError.length > 0 && (
-                <div className="mb-4">
-                    {tramiteError.map((error, index) => (
-                        <p key={index} className="text-red-500">
-                            {error.message || error.error || error}
-                        </p>
-                    ))}
-                </div>
-            )}
-
-            {tramitesMostrar.length === 0 ? (
-                <p className="text-gray-600">No hay trámites para mostrar.</p>
-            ) : (
-                <div className="grid gap-4">
-                    {tramitesMostrar.map((tramite) => (
-                        <TramiteCard
-                            key={tramite.id}
-                            tramite={tramite}
-                            enviarAReactivar={enviarTramiteAReactivar}
-                            finalizarTramite={tramiteFinalizado}
-                            modoBusqueda={busqueda.trim() !== ''}
-                        />
-                    ))}
-                </div>
-            )}
         </div>
-    )
+
+        {tramiteError.length > 0 && (
+            <div className="mb-4">
+                {tramiteError.map((error, index) => (
+                    <p key={index} className="text-red-500">
+                        {error.message || error.error || error}
+                    </p>
+                ))}
+            </div>
+        )}
+
+        {tramitesMostrar.length === 0 ? (
+            <p className="text-gray-600">
+                No hay trámites para mostrar.
+            </p>
+        ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+
+                {tramitesMostrar.map((tramite) => (
+                    <TramiteCard
+                        key={tramite.id}
+                        tramite={tramite}
+                        enviarAReactivar={enviarTramiteAReactivar}
+                        finalizarTramite={tramiteFinalizado}
+                        modoBusqueda={busqueda.trim() !== ''}
+                    />
+                ))}
+
+            </div>
+        )}
+
+    </div>
+)
 }
 
 export default TramitesPage

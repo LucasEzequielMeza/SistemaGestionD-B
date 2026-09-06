@@ -42,13 +42,6 @@ function DashboardPage() {
                     </div>
                 </Card>
 
-                <Card>
-                    <h2 className="text-lg font-bold text-white">Documentación pendiente</h2>
-                    <p className="text-3xl font-bold text-white mt-2">
-                        {resumen.documentacion_pendiente}
-                    </p>
-                </Card>
-
                 <Card className="cursor-pointer hover:bg-zinc-800 transition">
                     <div onClick={() => navigate('/tramites/finalizados')}>
                         <h2 className="text-lg font-bold text-white">Trámites completos</h2>
