@@ -229,7 +229,7 @@ CROSS JOIN documentos d
 WHERE tt.codigo = 'LES'
 AND d.nombre IN (
     'Pacto',
-    'Planilla',
+    'Planilla', 
     'Autoriza',
     'Orden médica',
     'SV',
@@ -338,3 +338,40 @@ ALTER TABLE tramites
 ADD CONSTRAINT fk_tramite_usuario
 FOREIGN KEY (user_id)
 REFERENCES usuarios(id);
+
+INSERT INTO documentos (nombre, se_carga_lex)
+VALUES ('Poder', FALSE);
+
+INSERT INTO tipo_tramite_documentos (
+    tipo_tramite_id,
+    documento_id,
+    obligatorio
+)
+SELECT
+    tt.id,
+    d.id,
+    TRUE
+FROM tipos_tramite tt
+CROSS JOIN documentos d
+WHERE tt.codigo IN ('LES', 'CONDLES', 'TITCONDLES')
+AND d.nombre = 'Poder';
+
+DELETE FROM tipo_tramite_documentos
+WHERE documento_id = (
+    SELECT id
+    FROM documentos
+    WHERE nombre = 'Declaración testimonial'
+);
+
+UPDATE tipo_tramite_documentos
+SET obligatorio = TRUE
+WHERE documento_id = (
+    SELECT id
+    FROM documentos
+    WHERE nombre = 'Relato de los hechos'
+)
+AND tipo_tramite_id IN (
+    SELECT id
+    FROM tipos_tramite
+    WHERE codigo IN ('LES', 'CONDLES')
+);

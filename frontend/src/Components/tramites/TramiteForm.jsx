@@ -10,7 +10,7 @@ import {useTramite} from '../../Context/TramiteContexto'
 
 function TramiteForm() {
 
-  const {register, handleSubmit, formState: {errors}, setValue, watch} = useForm({
+  const {register, handleSubmit, formState: {errors}, setValue} = useForm({
     defaultValues: {
         tipo_tramite_id: ""
     }
@@ -21,8 +21,6 @@ function TramiteForm() {
   const [errorNumeroCarpeta, setErrorNumeroCarpeta] = useState("");
 
   const navigate = useNavigate();
-
-  const huboIntervencionPolicial = watch("intervencion_policial");
 
   const {
     actualizarTramite, 
@@ -136,38 +134,23 @@ function TramiteForm() {
             <p className='text-red-500'>El nombre del cliente es requerido</p>
           )}
             <Label htmlFor="intervencion_policial">
-              ¿Hubo intervención policial?
+                ¿Hubo intervención policial?
             </Label>
+
             <select
-              className="bg-zinc-800 px-3 py-2 block my-2 w-full text-white"
-              {...register("intervencion_policial", {
-                required: "Debe indicar si hubo intervención policial"
-              })}
+                className="bg-zinc-800 px-3 py-2 block my-2 w-full text-white"
+                {...register("intervencion_policial", {
+                    required: "Debe indicar si hubo intervención policial"
+                })}
             >
-              <option value="no">No</option>
-              <option value="si">Sí</option>
+                <option value="no">No</option>
+                <option value="si">Sí</option>
             </select>
-            {huboIntervencionPolicial === "si" && (
-              <>
-                <Label htmlFor="documentacion_policial">
-                  Documentación policial
-                </Label>
 
-                <select
-                  className="bg-zinc-800 px-3 py-2 block my-2 w-full text-white"
-                  {...register("documentacion_policial", {
-                    required: "Debe seleccionar la documentación"
-                  })}
-                >
-                  <option value="declaracion_testimonial">
-                    Declaración testimonial
-                  </option>
-
-                  <option value="denuncia_penal">
-                    Denuncia penal
-                  </option>
-                </select>
-              </>
+            {errors.intervencion_policial && (
+                <p className="text-red-500">
+                    {errors.intervencion_policial.message}
+                </p>
             )}
           <Button type="submit">
               {params.id ? "Actualizar" : "Crear"}

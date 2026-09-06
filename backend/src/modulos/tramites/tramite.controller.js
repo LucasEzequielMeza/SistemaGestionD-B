@@ -186,8 +186,12 @@ export const crearTramite = async (req, res, next) => {
     const {
         tipo_tramite_id,
         numero_carpeta,
-        nombre_cliente
+        nombre_cliente,
+        intervencion_policial
     } = req.body;
+
+    console.log("Datos recibidos:", req.body);
+    console.log("Intervención policial:", intervencion_policial);
 
     const client = await pool.connect();
 
@@ -198,18 +202,14 @@ export const crearTramite = async (req, res, next) => {
 
         // Creamos el trámite
         const tramiteResult = await client.query(`
-
             INSERT INTO tramites (
                 tipo_tramite_id,
                 user_id,
                 numero_carpeta,
                 nombre_cliente
             )
-
             VALUES ($1, $2, $3, $4)
-
             RETURNING *
-
         `, [
             tipo_tramite_id,
             req.userId,
@@ -219,34 +219,58 @@ export const crearTramite = async (req, res, next) => {
 
         const tramite = tramiteResult.rows[0];
 
-        // Buscamos los documentos que corresponden al tipo de trámite
+        // Buscamos los documentos normales que corresponden al tipo de trámite
         const documentosResult = await client.query(`
-
-            SELECT documento_id
-
+            SELECT tipo_tramite_documentos.documento_id
             FROM tipo_tramite_documentos
-
-            WHERE tipo_tramite_id = $1
-
+            INNER JOIN documentos
+                ON tipo_tramite_documentos.documento_id = documentos.id
+            WHERE tipo_tramite_documentos.tipo_tramite_id = $1
+            AND documentos.nombre <> 'Declaración testimonial'
         `, [tipo_tramite_id]);
 
         // Creamos los documentos correspondientes al trámite
         for (const documento of documentosResult.rows) {
 
             await client.query(`
-
                 INSERT INTO tramite_documentos (
                     tramite_id,
                     documento_id
                 )
-
                 VALUES ($1, $2)
-
             `, [
                 tramite.id,
                 documento.documento_id
             ]);
         }
+
+        // Si hubo intervención policial, agregamos la declaración testimonial
+        if (intervencion_policial === "si") {
+
+    const declaracionResult = await client.query(`
+        SELECT id
+        FROM documentos
+        WHERE nombre = 'Declaración testimonial'
+    `);
+
+    console.log("Declaración encontrada:", declaracionResult.rows);
+
+    if (declaracionResult.rows.length > 0) {
+
+        await client.query(`
+            INSERT INTO tramite_documentos (
+                tramite_id,
+                documento_id
+            )
+            VALUES ($1, $2)
+        `, [
+            tramite.id,
+            declaracionResult.rows[0].id
+        ]);
+
+        console.log("Declaración testimonial insertada");
+    }
+}
 
         // Confirmamos todos los cambios
         await client.query('COMMIT');
@@ -254,7 +278,9 @@ export const crearTramite = async (req, res, next) => {
         // Devolvemos el trámite creado
         return res.status(201).json({
             tramite,
-            documentos_creados: documentosResult.rowCount
+            documentos_creados:
+                documentosResult.rowCount +
+                (intervencion_policial === "si" ? 1 : 0)
         });
 
     } catch (error) {

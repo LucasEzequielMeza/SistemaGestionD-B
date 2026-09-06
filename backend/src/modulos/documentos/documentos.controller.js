@@ -12,7 +12,7 @@ export const obtenerDocumentosPorTramite = async (req, res) => {
                 tramite_documentos.id,
                 documentos.nombre,
                 documentos.se_carga_lex,
-                tipo_tramite_documentos.obligatorio,
+                COALESCE(tipo_tramite_documentos.obligatorio, true) AS obligatorio,
                 tramite_documentos.estado,
                 tramite_documentos.observaciones,
                 tramite_documentos.recibido_at,
@@ -26,7 +26,7 @@ export const obtenerDocumentosPorTramite = async (req, res) => {
             INNER JOIN tramites
                 ON tramite_documentos.tramite_id = tramites.id
 
-            INNER JOIN tipo_tramite_documentos
+            LEFT JOIN tipo_tramite_documentos
                 ON tipo_tramite_documentos.tipo_tramite_id = tramites.tipo_tramite_id
                 AND tipo_tramite_documentos.documento_id = tramite_documentos.documento_id
 
