@@ -12,19 +12,11 @@ const app = express();
 
 // Middlewares
 app.use(cors({
-    origin: function (origin, callback) {
-        // Permitimos solicitudes sin origen, como algunas herramientas de prueba
-        if (!origin) {
-            return callback(null, true);
-        }
 
-        if (origenesPermitidos.includes(origin)) {
-            return callback(null, true);
-        }
+    origin: "http://localhost:5173",
 
-        return callback(new Error("Origen no permitido por CORS"));
-    },
     credentials: true
+
 }));
 app.use(cookieParser());
 app.use(morgan("dev"));
