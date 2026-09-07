@@ -162,8 +162,14 @@ export const register = async (req, res) => {
 
 export const logout = (req, res) => {
 
-    // Eliminamos la cookie del token
-    res.clearCookie('token');
+    // Eliminamos la cookie del token usando la misma configuración de producción
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production'
+            ? 'none'
+            : 'lax'
+    });
 
     return res.json({
         success: true,
