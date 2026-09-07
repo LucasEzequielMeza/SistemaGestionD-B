@@ -1,5 +1,5 @@
 import React, {useState} from "react"
-import { Routes, Route, Navigate } from "react-router-dom"
+import { Routes, Route, Navigate, useLocation } from "react-router-dom"
 import LoginPage from "./Page/LoginPage"
 import RegisterPage from "./Page/RegisterPage"
 import TramitesPage from "./Page/TramitesPage"
@@ -20,19 +20,27 @@ import Notificaciones from "./Components/notificaciones/Notificaciones"
 function App() {
 
   const [menuAbierto, setMenuAbierto] = useState(true)
+  const location = useLocation()
 
+  const esPaginaAutenticacion =
+        location.pathname === "/iniciar-sesion" ||
+        location.pathname === "/registro"
 
   return (
     <>
-      <Navbar 
-        menuAbierto={menuAbierto}
-        setMenuAbierto={setMenuAbierto}
-      />
+      {!esPaginaAutenticacion && (
+                <Navbar
+                    menuAbierto={menuAbierto}
+                    setMenuAbierto={setMenuAbierto}
+                />
+      )}
 
       <main
-        className={`transition-all duration-300 ${
-          menuAbierto ? "ml-64" : "ml-20"
-        }`}
+          className={
+              esPaginaAutenticacion
+                  ? "min-h-screen"
+                  : `transition-all duration-300 ${menuAbierto ? "ml-64" : "ml-20"}`
+          }
       >
         <Container>
           <Routes>

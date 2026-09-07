@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { useRecordatorio } from './RecordatorioContexto'
 import { useAuth } from './ContextoAutorizacion'
-
 export const NotificacionContexto = createContext();
 
 export const useNotificacion = () => {
@@ -25,7 +24,8 @@ export function NotificacionProvider({ children }) {
     );
 
     useEffect(() => {
-        // Espero a que termine de verificarse la sesión y solamente continúo si estoy autenticado
+
+        // Espero a que termine de verificarse la sesión y solamente continúo si estoy autenticado.
         if (cargando || !estaAutorizado) {
             return;
         }
@@ -50,14 +50,27 @@ export function NotificacionProvider({ children }) {
                     return null;
                 }
 
-                // Armo la fecha y hora en la que ocurre el recordatorio.
-                const fecha = new Date(recordatorio.fecha_evento);
-                const [hora, minutos] = recordatorio.hora_evento.split(':').map(Number);
+                // Armo la fecha y hora del recordatorio usando la fecha como fecha local.
+                // Evito new Date(fecha_evento) porque la fecha llega en UTC y puede correrse al día anterior.
 
-                fecha.setHours(hora);
-                fecha.setMinutes(minutos);
-                fecha.setSeconds(0);
-                fecha.setMilliseconds(0);
+                const [año, mes, dia] = recordatorio.fecha_evento
+                    .slice(0, 10)
+                    .split('-')
+                    .map(Number);
+
+                const [hora, minutos] = recordatorio.hora_evento
+                    .split(':')
+                    .map(Number);
+
+                const fecha = new Date(
+                    año,
+                    mes - 1,
+                    dia,
+                    hora,
+                    minutos,
+                    0,
+                    0
+                );
 
                 // Calculo cuándo tiene que aparecer la notificación.
                 const tiempoNotificacion = new Date(fecha);
@@ -66,14 +79,17 @@ export function NotificacionProvider({ children }) {
                 );
 
                 const tiempoNotificacionActual = tiempoNotificacion.getTime();
-                const fechaNotificacionAnterior = recordatoriosNotificados.current[recordatorio.id];
+                const fechaNotificacionAnterior =
+                    recordatoriosNotificados.current[recordatorio.id];
 
-                // Si ya notifiqué este recordatorio para esta fecha y hora, no lo vuelvo a mostrar.
+                // Si ya notifiqué este recordatorio para esta fecha y hora,
+                // no lo vuelvo a mostrar al actualizar la página.
                 if (fechaNotificacionAnterior === tiempoNotificacionActual) {
                     return null;
                 }
 
-                const diferencia = ahora.getTime() - tiempoNotificacionActual;
+                const diferencia =
+                    ahora.getTime() - tiempoNotificacionActual;
 
                 // Solo notifico durante los primeros 30 segundos desde la hora indicada.
                 if (diferencia >= 0 && diferencia <= 30000) {
@@ -82,7 +98,6 @@ export function NotificacionProvider({ children }) {
                         tiempoNotificacionActual
                     };
                 }
-
                 return null;
             })
             .filter(Boolean);
@@ -93,21 +108,36 @@ export function NotificacionProvider({ children }) {
 
         setNotificaciones((notificacionesActuales) => [
             ...notificacionesActuales,
-            ...recordatoriosParaNotificar.map(({ recordatorio }) => recordatorio)
+
+            ...recordatoriosParaNotificar.map(
+                ({ recordatorio }) => recordatorio
+            )
+
         ]);
 
-        recordatoriosParaNotificar.forEach(({ recordatorio, tiempoNotificacionActual }) => {
-            // Guardo cuándo lo notifiqué para no volver a mostrarlo al actualizar la página.
-            recordatoriosNotificados.current[recordatorio.id] = tiempoNotificacionActual;
+        recordatoriosParaNotificar.forEach(
+            ({ recordatorio, tiempoNotificacionActual }) => {
 
-            localStorage.setItem(
-                'recordatoriosNotificados',
-                JSON.stringify(recordatoriosNotificados.current)
-            );
+                // Guardo cuándo lo notifiqué para no volver a mostrarlo al actualizar la página.
 
-            // Muestro también la notificación nativa del navegador.
-            mostrarNotificacionNativa(recordatorio);
-        });
+                recordatoriosNotificados.current[recordatorio.id] =
+                    tiempoNotificacionActual;
+
+                localStorage.setItem(
+
+                    'recordatoriosNotificados',
+
+                    JSON.stringify(recordatoriosNotificados.current)
+
+                );
+
+                // Muestro también la notificación nativa del navegador.
+
+                mostrarNotificacionNativa(recordatorio);
+
+            }
+        );
+
     }, [recordatorios]);
 
     // Muestro en el título cuántas notificaciones tengo pendientes.
@@ -129,7 +159,6 @@ export function NotificacionProvider({ children }) {
         if (!("Notification" in window)) {
             return false;
         }
-
         const permiso = await Notification.requestPermission();
         return permiso === "granted";
     };
@@ -156,7 +185,12 @@ export function NotificacionProvider({ children }) {
                 }
             });
         } catch (error) {
-            console.error('Error al mostrar la notificación nativa:', error);
+
+            console.error(
+                'Error al mostrar la notificación nativa:',
+                error
+            );
+
         }
     };
 
