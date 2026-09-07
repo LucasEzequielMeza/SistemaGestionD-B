@@ -1,8 +1,8 @@
 import React from 'react'
 import Card from "../Components/UI/Card"
 import Input from "../Components/UI/Input"
-import Button from '../components/UI/Button';
-import Label from '../components/UI/Label';
+import Button from '../Components/UI/Button';
+import Label from '../Components/UI/Label';
 import {Link, useNavigate} from "react-router-dom"
 import {useForm} from "react-hook-form"
 import { useAuth } from '../Context/ContextoAutorizacion.jsx';
