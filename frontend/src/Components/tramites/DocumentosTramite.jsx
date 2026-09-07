@@ -1,36 +1,18 @@
 import React from 'react'
-
 import Card from '../UI/Card'
-
 import Button from '../UI/Button'
+import axios from '../../Api/axios.js'
 
 function DocumentosTramite({documentos = [], setDocumentos}) {
 
     const cambiarEstado = async (id, accion) => {
-
         try {
-
-            const respuesta = await fetch(
-                `http://localhost:3001/api/documentos/tramite-documento/${id}/${accion}`,
-                {
-                    method: 'PUT',
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`
-                    }
-                }
+            const respuesta = await axios.put(
+                `/documentos/tramite-documento/${id}/${accion}`
             )
 
-            if (!respuesta.ok) {
-
-                const error = await respuesta.json()
-
-                throw new Error(
-                    error.error || 'No se pudo actualizar el documento'
-                )
-            }
-
             // Obtenemos el documento que acaba de actualizar el servidor.
-            const documentoActualizado = await respuesta.json()
+            const documentoActualizado = respuesta.data
 
             // Actualizamos solamente ese documento en la lista.
             setDocumentos((documentosActuales) =>
@@ -43,9 +25,7 @@ function DocumentosTramite({documentos = [], setDocumentos}) {
                         : documento
                 )
             )
-
         } catch (error) {
-
             console.error(
                 'Error al cambiar el estado del documento:',
                 error
