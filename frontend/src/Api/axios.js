@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const client = axios.create({
-    baseURL: 'http://localhost:3001/api',
-    withCredentials: true, // Enable cookies for cross-domain requests
-})
+    baseURL: "https://sistemagestiond-b.onrender.com/api",
+    withCredentials: true,
+});
 
-export default client
+export default client;
