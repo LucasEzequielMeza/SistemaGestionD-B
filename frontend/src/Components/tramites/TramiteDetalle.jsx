@@ -47,8 +47,8 @@ function TramiteDetalle() {
     return (
 
         <div>
-            <div className="flex items-center justify-between my-6">
-                <h1 className="text-4xl font-bold text-zinc-950">
+            <div className="w-fit min-w-[500px] mx-auto flex items-center justify-between my-6">
+                <h1 className="text-2xl font-bold text-zinc-950">
                     Detalle del trámite
                 </h1>
                 <Button onClick={() => navigate('/tramites')}>

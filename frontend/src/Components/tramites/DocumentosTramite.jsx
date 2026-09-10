@@ -82,7 +82,7 @@ function DocumentosTramite({documentos = [], setDocumentos}) {
     ).length
 
     return (
-        <Card className="h-full p-4 flex flex-col">
+        <Card className="w-fit min-w-[500px] p-4 flex flex-col mx-auto">
             <div className="flex items-center justify-between mb-3 shrink-0">
                 <h2 className="text-xl font-bold">
                     Documentación
@@ -100,9 +100,9 @@ function DocumentosTramite({documentos = [], setDocumentos}) {
                     {documentos.map((documento) => (
                         <div
                             key={documento.id}
-                            className="flex items-center gap-3 px-3 py-1 border-b border-white/20 last:border-b-0 min-h-[31px]"
+                            className="flex items-center gap-2 px-3 py-1 border-b border-white/20 last:border-b-0 min-h-[31px]"
                         >
-                            <div className="flex-1 min-w-0">
+                            <div className="w-48 min-w-0">
                                 <span className="text-sm font-medium truncate">
                                     {documento.nombre}
                                 </span>
@@ -113,53 +113,29 @@ function DocumentosTramite({documentos = [], setDocumentos}) {
                                     </span>
                                 )}
                             </div>
-                            <span
-                                className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${obtenerEstiloEstado(documento.estado)}`}
-                            >
-                                {obtenerTextoEstado(documento.estado)}
-                            </span>
-                            {documento.estado === 'no_pedido' && (
+                                <div className="ml-auto flex items-center gap-2">
+                                    <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${obtenerEstiloEstado(documento.estado)}`}>
+                                        {obtenerTextoEstado(documento.estado)}
+                                    </span>
 
-                                <Button
-                                    className="!px-2.5 !py-1 !text-xs"
-                                    onClick={() =>
-                                        cambiarEstado(
-                                            documento.id,
-                                            'pendiente'
-                                        )
-                                    }
-                                >
-                                    Pedir
-                                </Button>
-                            )}
-                            {documento.estado === 'pendiente' && (
-                                <Button
-                                    className="!px-2.5 !py-1 !text-xs"
-                                    onClick={() =>
-                                        cambiarEstado(
-                                            documento.id,
-                                            'recibido'
-                                        )
-                                    }
-                                >
-                                    Recibido
-                                </Button>
-                            )}
-                            {documento.estado === 'recibido' &&
-                                documento.se_carga_lex && (
+                                    {documento.estado === 'no_pedido' && (
+                                        <Button className="!px-2.5 !py-1 !text-xs" onClick={() => cambiarEstado(documento.id, 'pendiente')}>
+                                            Pedir
+                                        </Button>
+                                    )}
 
-                                    <Button
-                                        className="!px-2.5 !py-1 !text-xs"
-                                        onClick={() =>
-                                            cambiarEstado(
-                                                documento.id,
-                                                'cargar-lex'
-                                            )
-                                        }
-                                    >
-                                        Cargar LEX
-                                    </Button>
-                                )}
+                                    {documento.estado === 'pendiente' && (
+                                        <Button className="!px-2.5 !py-1 !text-xs" onClick={() => cambiarEstado(documento.id, 'recibido')}>
+                                            Recibido
+                                        </Button>
+                                    )}
+
+                                    {documento.estado === 'recibido' && documento.se_carga_lex && (
+                                        <Button className="!px-2.5 !py-1 !text-xs" onClick={() => cambiarEstado(documento.id, 'cargar-lex')}>
+                                            Cargar LEX
+                                        </Button>
+                                    )}
+                            </div>
                         </div>
                     ))}
                 </div>

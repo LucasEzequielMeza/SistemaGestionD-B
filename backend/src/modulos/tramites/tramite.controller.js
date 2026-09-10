@@ -318,8 +318,6 @@ export const actualizarTramite = async (req, res) => {
         intervencion_policial
     } = req.body;
 
-    console.log("Intervención policial recibida:", intervencion_policial);
-
     const client = await pool.connect();
 
     try {
