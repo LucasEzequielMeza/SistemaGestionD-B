@@ -53,9 +53,17 @@ export const obtenerTramitePorId = async (req, res) => {
     try {
 
         const result = await pool.query(`
-            SELECT 
-                tramites.*,
-                tipos_tramite.codigo AS tipo_tramite
+            SELECT
+            tramites.*,
+            tipos_tramite.codigo AS tipo_tramite,
+            EXISTS (
+                SELECT 1
+                FROM tramite_documentos
+                INNER JOIN documentos
+                    ON tramite_documentos.documento_id = documentos.id
+                WHERE tramite_documentos.tramite_id = tramites.id
+                AND documentos.nombre = 'Declaración testimonial'
+            ) AS intervencion_policial
             FROM tramites
             INNER JOIN tipos_tramite
                 ON tramites.tipo_tramite_id = tipos_tramite.id
@@ -190,9 +198,6 @@ export const crearTramite = async (req, res, next) => {
         intervencion_policial
     } = req.body;
 
-    console.log("Datos recibidos:", req.body);
-    console.log("Intervención policial:", intervencion_policial);
-
     const client = await pool.connect();
 
     try {
@@ -244,33 +249,29 @@ export const crearTramite = async (req, res, next) => {
             ]);
         }
 
-        // Si hubo intervención policial, agregamos la declaración testimonial
+        // Si hubo intervención policial, buscamos y agregamos la declaración testimonial
         if (intervencion_policial === "si") {
 
-    const declaracionResult = await client.query(`
-        SELECT id
-        FROM documentos
-        WHERE nombre = 'Declaración testimonial'
-    `);
+            const declaracionResult = await client.query(`
+                SELECT id
+                FROM documentos
+                WHERE nombre = 'Declaración testimonial'
+            `);
 
-    console.log("Declaración encontrada:", declaracionResult.rows);
+            if (declaracionResult.rows.length > 0) {
 
-    if (declaracionResult.rows.length > 0) {
-
-        await client.query(`
-            INSERT INTO tramite_documentos (
-                tramite_id,
-                documento_id
-            )
-            VALUES ($1, $2)
-        `, [
-            tramite.id,
-            declaracionResult.rows[0].id
-        ]);
-
-        console.log("Declaración testimonial insertada");
-    }
-}
+                await client.query(`
+                    INSERT INTO tramite_documentos (
+                        tramite_id,
+                        documento_id
+                    )
+                    VALUES ($1, $2)
+                `, [
+                    tramite.id,
+                    declaracionResult.rows[0].id
+                ]);
+            }
+        }
 
         // Confirmamos todos los cambios
         await client.query('COMMIT');
@@ -313,8 +314,11 @@ export const actualizarTramite = async (req, res) => {
     // Obtenemos los datos que queremos modificar
     const {
         tipo_tramite_id,
-        nombre_cliente
+        nombre_cliente,
+        intervencion_policial
     } = req.body;
+
+    console.log("Intervención policial recibida:", intervencion_policial);
 
     const client = await pool.connect();
 
@@ -365,9 +369,17 @@ export const actualizarTramite = async (req, res) => {
             DELETE FROM tramite_documentos
             WHERE tramite_id = $1
             AND documento_id NOT IN (
-                SELECT documento_id
+                SELECT tipo_tramite_documentos.documento_id
                 FROM tipo_tramite_documentos
-                WHERE tipo_tramite_id = $2
+                INNER JOIN documentos
+                    ON tipo_tramite_documentos.documento_id = documentos.id
+                WHERE tipo_tramite_documentos.tipo_tramite_id = $2
+                AND documentos.nombre <> 'Declaración testimonial'
+            )
+            AND documento_id IN (
+                SELECT documentos.id
+                FROM documentos
+                WHERE documentos.nombre <> 'Declaración testimonial'
             )
         `, [
             id,
@@ -395,10 +407,58 @@ export const actualizarTramite = async (req, res) => {
                 AND tramite_documentos.documento_id =
                     tipo_tramite_documentos.documento_id
             )
+            AND tipo_tramite_documentos.documento_id NOT IN (
+                SELECT documentos.id
+                FROM documentos
+                WHERE documentos.nombre = 'Declaración testimonial'
+            )
         `, [
             id,
             tipo_tramite_id
         ]);
+        
+        const declaracionResult = await client.query(`
+            SELECT id
+            FROM documentos
+            WHERE nombre = 'Declaración testimonial'
+        `);
+
+        if (declaracionResult.rows.length > 0) {
+
+            const declaracionId = declaracionResult.rows[0].id;
+
+            if (intervencion_policial === "si") {
+
+                await client.query(`
+                    INSERT INTO tramite_documentos (
+                        tramite_id,
+                        documento_id,
+                        estado
+                    )
+                    SELECT $1, $2, 'no_pedido'
+                    WHERE NOT EXISTS (
+                        SELECT 1
+                        FROM tramite_documentos
+                        WHERE tramite_documentos.tramite_id = $1
+                        AND tramite_documentos.documento_id = $2
+                    )
+                `, [
+                    id,
+                    declaracionId
+                ]);
+
+            } else {
+
+                await client.query(`
+                    DELETE FROM tramite_documentos
+                    WHERE tramite_id = $1
+                    AND documento_id = $2
+                `, [
+                    id,
+                    declaracionId
+                ]);
+            }
+        }
 
         // Confirmamos todos los cambios
         await client.query('COMMIT');

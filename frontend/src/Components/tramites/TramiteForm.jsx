@@ -12,7 +12,8 @@ function TramiteForm() {
 
   const {register, handleSubmit, formState: {errors}, setValue} = useForm({
     defaultValues: {
-        tipo_tramite_id: ""
+        tipo_tramite_id: "",
+        intervencion_policial: "no"
     }
   });
 
@@ -57,6 +58,9 @@ function TramiteForm() {
             setValue('tipo_tramite_id', tramiteItem.tipo_tramite_id);
             setValue('numero_carpeta', tramiteItem.numero_carpeta);
             setValue('nombre_cliente', tramiteItem.nombre_cliente);
+            setValue('intervencion_policial',
+                tramiteItem.intervencion_policial ? "si" : "no"
+            );
         });
     }
 }, [params.id]);

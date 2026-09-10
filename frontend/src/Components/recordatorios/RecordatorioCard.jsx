@@ -7,11 +7,12 @@ function RecordatorioCard({recordatorio, eliminarRecordatorio, finalizarRecordat
 
   const navigate = useNavigate()
 
-  const formatearFecha = (fecha) => {
-    return new Date(fecha).toLocaleDateString('es-AR', {
-      timeZone: 'America/Argentina/Buenos_Aires'
-    });
-  };
+  const formatearFecha = (fecha) => { 
+
+    const [año, mes, dia] = fecha.slice(0, 10).split('-')
+
+    return `${dia}/${mes}/${año}`
+  }
 
   const formatearHora = (hora) => {
     return hora.slice(0, 5);
