@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { useRecordatorio } from './RecordatorioContexto'
 import { useAuth } from './ContextoAutorizacion'
+import axios from '../Api/axios.js'
 export const NotificacionContexto = createContext();
 
 export const useNotificacion = () => {
@@ -194,11 +195,32 @@ export function NotificacionProvider({ children }) {
         }
     };
 
+    const posponerRecordatorio = async (id, minutos) => {
+
+        try {
+            const respuesta = await axios.put(
+                `/recordatorios/${id}/posponer`,
+                { minutos }
+            );
+
+            quitarNotificacion(id);
+            obtenerRecordatorios();
+
+            return respuesta.data;
+        } catch (error) {
+            console.error(
+                'Error al posponer el recordatorio:',
+                error
+            );
+        }
+    };
+
     return (
         <NotificacionContexto.Provider value={{
             notificaciones,
             quitarNotificacion,
-            solicitarPermisoNotificaciones
+            solicitarPermisoNotificaciones,
+            posponerRecordatorio
         }}>
             {children}
         </NotificacionContexto.Provider>

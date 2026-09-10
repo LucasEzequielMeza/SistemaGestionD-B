@@ -169,3 +169,34 @@ export const recordatorioFinalizado = async (req, res) => {
         res.status(500).json({ error: 'Error al finalizar el recordatorio' });
     }
 }
+
+export const posponerRecordatorio = async (req, res) => {
+    const { id } = req.params;
+    const { minutos } = req.body;
+
+    try {
+        const result = await pool.query(
+            `UPDATE recordatorios
+            SET hora_evento = hora_evento + ($1 * INTERVAL '1 minute')
+            WHERE id = $2
+            AND user_id = $3
+            AND completado = false
+            RETURNING *`,
+            [minutos, id, req.userId]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                error: 'Recordatorio no encontrado'
+            });
+        }
+
+        return res.status(200).json(result.rows[0]);
+
+    } catch (error) {
+        console.error('Error al posponer el recordatorio:', error);
+        res.status(500).json({
+            error: 'Error al posponer el recordatorio'
+        });
+    }
+}

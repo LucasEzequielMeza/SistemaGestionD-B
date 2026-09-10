@@ -6,7 +6,8 @@ import {
     crearRecordatorio,
     actualizarRecordatorio,
     eliminarRecordatorio,
-    recordatorioFinalizado
+    recordatorioFinalizado, 
+    posponerRecordatorio
 } from "./recordatorios.controller.js";
 
 import {estaAutenticado} from "../../middleware/autenticacion.middleware.js";
@@ -27,6 +28,8 @@ router.put("/:id", estaAutenticado(), actualizarRecordatorio);
 
 // Marco un recordatorio como completado
 router.put("/:id/finalizar", estaAutenticado(), recordatorioFinalizado);
+
+router.put('/:id/posponer', estaAutenticado(), posponerRecordatorio);
 
 // Elimino un recordatorio
 router.delete("/:id", estaAutenticado(), eliminarRecordatorio);
