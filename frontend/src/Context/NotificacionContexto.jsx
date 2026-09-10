@@ -195,6 +195,27 @@ export function NotificacionProvider({ children }) {
         }
     };
 
+    const cerrarNotificacionNativa = async (id) => {
+
+        try {
+            const registro = await navigator.serviceWorker.ready;
+
+            const notificaciones = await registro.getNotifications({
+                tag: id
+            });
+
+            notificaciones.forEach((notificacion) => {
+                notificacion.close();
+            });
+
+        } catch (error) {
+            console.error(
+                'Error al cerrar la notificación nativa:',
+                error
+            );
+        }
+    };
+
     const posponerRecordatorio = async (id, minutos) => {
 
         try {
@@ -204,6 +225,9 @@ export function NotificacionProvider({ children }) {
             );
 
             quitarNotificacion(id);
+
+            await cerrarNotificacionNativa(id);
+
             obtenerRecordatorios();
 
             return respuesta.data;
