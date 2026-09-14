@@ -33,6 +33,8 @@ export const obtenerTramites = async (req, res) => {
                 tramites.id,
                 tipos_tramite.codigo
 
+            ORDER BY CAST(tramites.numero_carpeta AS INTEGER) ASC  
+
         `, [req.userId]);
 
         return res.json(result.rows);

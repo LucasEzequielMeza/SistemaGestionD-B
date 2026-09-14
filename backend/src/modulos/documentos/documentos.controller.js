@@ -247,3 +247,92 @@ export const marcarDocumentoPendiente = async (req, res) => {
         });
     }
 };
+
+export const volverDocumentoPendiente = async (req, res) => {
+
+    // Obtengo el ID del documento del trámite desde la URL
+    const { id } = req.params;
+
+    try {
+
+        const result = await pool.query(`
+            UPDATE tramite_documentos
+            SET estado = 'pendiente',
+                recibido_at = NULL,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = $1
+            AND estado = 'recibido'
+            RETURNING *
+        `, [id]);
+
+        // Si no encontramos el documento o no estaba en estado "recibido"
+        if (result.rows.length === 0) {
+
+            return res.status(404).json({
+                error: "Documento no encontrado o no está en estado recibido"
+            });
+
+        }
+
+        // Devuelvo el documento actualizado
+        return res.status(200).json(result.rows[0]);
+
+    } catch (error) {
+
+        console.error(
+            "Error al volver el documento a pendiente:",
+            error
+        );
+
+        return res.status(500).json({
+            error: "Error al volver el documento a pendiente"
+        });
+
+    }
+
+};
+
+
+export const volverDocumentoRecibido = async (req, res) => {
+
+    // Obtengo el ID del documento del trámite desde la URL
+    const { id } = req.params;
+
+    try {
+
+        const result = await pool.query(`
+            UPDATE tramite_documentos
+            SET estado = 'recibido',
+                cargado_lex_at = NULL,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = $1
+            AND estado = 'cargado'
+            RETURNING *
+        `, [id]);
+
+        // Si no encontramos el documento o no estaba en estado "cargado"
+        if (result.rows.length === 0) {
+
+            return res.status(404).json({
+                error: "Documento no encontrado o no está en estado cargado"
+            });
+
+        }
+
+        // Devuelvo el documento actualizado
+        return res.status(200).json(result.rows[0]);
+
+    } catch (error) {
+
+        console.error(
+            "Error al volver el documento a recibido:",
+            error
+        );
+
+        return res.status(500).json({
+            error: "Error al volver el documento a recibido"
+        });
+
+    }
+
+};

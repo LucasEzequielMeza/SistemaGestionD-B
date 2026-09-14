@@ -5,7 +5,9 @@ import {
     actualizarDocumentoTramite,
     marcarDocumentoRecibido,
     marcarDocumentoCargadoLex,
-    marcarDocumentoPendiente
+    marcarDocumentoPendiente,
+    volverDocumentoPendiente,
+    volverDocumentoRecibido
 } from "./documentos.controller.js";
 
 
@@ -33,6 +35,16 @@ router.put(
 router.put(
     '/tramite-documento/:id/cargar-lex',
     marcarDocumentoCargadoLex
+);
+
+router.put(
+    '/tramite-documento/:id/volver-pendiente',
+    volverDocumentoPendiente
+);
+
+router.put(
+    '/tramite-documento/:id/volver-recibido',
+    volverDocumentoRecibido
 );
 
 

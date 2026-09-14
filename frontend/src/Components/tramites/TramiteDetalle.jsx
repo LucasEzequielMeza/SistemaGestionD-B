@@ -66,6 +66,29 @@ function TramiteDetalle() {
                     ))}
                 </div>
             )}
+
+            <div className="w-fit min-w-[500px] mx-auto bg-[#5A1725] text-white p-4 rounded-md mt-6">
+                <div className="flex items-center gap-8">
+                    <div>
+                        <span className="text-sm text-white/60">
+                            Cliente:
+                        </span>
+                        <span className="ml-2 font-semibold">
+                            {tramite.nombre_cliente}
+                        </span>
+                    </div>
+
+                    <div>
+                        <span className="text-sm text-white/60">
+                            Número de carpeta:
+                        </span>
+                        <span className="ml-2 font-semibold">
+                            {tramite.numero_carpeta}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
             <div className="mt-6">
                 {cargandoDocumentos ? (
                     <Card>
