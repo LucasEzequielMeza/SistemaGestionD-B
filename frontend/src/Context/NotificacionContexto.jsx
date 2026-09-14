@@ -173,6 +173,10 @@ export function NotificacionProvider({ children }) {
             return;
         }
 
+        if (document.visibilityState === 'visible') {
+            return;
+        }
+
         try {
             // Espero a que el Service Worker esté disponible.
             const registro = await navigator.serviceWorker.ready;

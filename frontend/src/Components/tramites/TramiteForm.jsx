@@ -101,9 +101,18 @@ function TramiteForm() {
   return (
     <div>
       <Card>
-        <h2 className='text-3xl font-bold text-white my-4 flex items-center justify-center'>
-          {params.id ? "Editar tramite" : "Crear tramite"}
-        </h2>
+      <div className="flex items-center justify-between my-4">
+          <h2 className="text-3xl font-bold text-white">
+              {params.id ? "Editar tramite" : "Crear tramite"}
+          </h2>
+
+          <Button
+              type="button"
+              onClick={() => navigate('/tramites')}
+          >
+              Volver
+          </Button>
+      </div>
          <form onSubmit={onSubmit}>
           <Label htmlFor="tipo_tramite_id">Tipo de tramite</Label>
             <select className="bg-zinc-800 px-3 py-2 block my-2 w-full text-white"
