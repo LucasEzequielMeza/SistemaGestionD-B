@@ -137,7 +137,17 @@ function TramiteForm() {
                   {errorNumeroCarpeta}
               </p>
           )}
-          <Input type="text" {...register('numero_carpeta', { required: true })} />
+          <Input
+              type="text"
+              inputMode="numeric"
+              {...register('numero_carpeta', {
+                  required: true,
+                  pattern: {
+                      value: /^[0-9]+$/,
+                      message: 'El número de carpeta solo puede contener números'
+                  }
+              })}
+          />
           {errors.numero_carpeta && (
             <p className='text-red-500'>El numero de carpeta es requerido</p>
           )}

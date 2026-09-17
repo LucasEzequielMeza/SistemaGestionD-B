@@ -16,8 +16,13 @@ export const useNotificacion = () => {
 
 export function NotificacionProvider({ children }) {
     const { recordatorios, obtenerRecordatorios } = useRecordatorio();
-    const [notificaciones, setNotificaciones] = useState([]);
+    const [notificaciones, setNotificaciones] = useState(() => {
+        return JSON.parse(
+                localStorage.getItem('notificacionesPendientes') || '[]'
+        );
+    });
     const { estaAutorizado, cargando } = useAuth();
+    const [notificacionesVisibles, setNotificacionesVisibles] = useState([]);
 
     // Guardo cuándo notifiqué cada recordatorio para no repetirlo al actualizar la página.
     const recordatoriosNotificados = useRef(
@@ -107,13 +112,18 @@ export function NotificacionProvider({ children }) {
             return;
         }
 
+        const nuevasNotificaciones = recordatoriosParaNotificar.map(
+            ({ recordatorio }) => recordatorio
+        );
+
         setNotificaciones((notificacionesActuales) => [
             ...notificacionesActuales,
+            ...nuevasNotificaciones
+        ]);
 
-            ...recordatoriosParaNotificar.map(
-                ({ recordatorio }) => recordatorio
-            )
-
+        setNotificacionesVisibles((notificacionesActuales) => [
+            ...notificacionesActuales,
+            ...nuevasNotificaciones
         ]);
 
         recordatoriosParaNotificar.forEach(
@@ -148,8 +158,29 @@ export function NotificacionProvider({ children }) {
             : 'Sistema D&B';
     }, [notificaciones.length]);
 
+    useEffect(() => {
+        localStorage.setItem(
+            'notificacionesPendientes',
+            JSON.stringify(notificaciones)
+        );
+    }, [notificaciones]);
+
     const quitarNotificacion = (id) => {
         setNotificaciones((notificacionesActuales) =>
+            notificacionesActuales.filter(
+                (notificacion) => notificacion.id !== id
+            )
+        );
+
+        setNotificacionesVisibles((notificacionesActuales) =>
+            notificacionesActuales.filter(
+                (notificacion) => notificacion.id !== id
+            )
+        );
+    };
+
+    const ocultarNotificacion = (id) => {
+        setNotificacionesVisibles((notificacionesActuales) =>
             notificacionesActuales.filter(
                 (notificacion) => notificacion.id !== id
             )
@@ -246,7 +277,9 @@ export function NotificacionProvider({ children }) {
     return (
         <NotificacionContexto.Provider value={{
             notificaciones,
+            notificacionesVisibles,
             quitarNotificacion,
+            ocultarNotificacion,
             solicitarPermisoNotificaciones,
             posponerRecordatorio
         }}>

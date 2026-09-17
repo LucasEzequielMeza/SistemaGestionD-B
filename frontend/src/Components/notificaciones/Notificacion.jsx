@@ -7,12 +7,12 @@ function Notificacion({ notificacion, quitarNotificacion }) {
 
     const [mostrarOpciones, setMostrarOpciones] = useState(false);
 
-    const {posponerRecordatorio} = useNotificacion()
+    const {posponerRecordatorio, ocultarNotificacion} = useNotificacion()
 
     useEffect(() => {
         // Hago que la notificación desaparezca automáticamente después de 20 segundos.
         const tiempo = setTimeout(() => {
-            quitarNotificacion(notificacion.id);
+            ocultarNotificacion(notificacion.id);
         }, 20000);
 
         return () => clearTimeout(tiempo);

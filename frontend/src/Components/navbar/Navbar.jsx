@@ -9,7 +9,7 @@ import { useNotificacion } from '../../Context/NotificacionContexto.jsx';
 function NavBar({ menuAbierto, setMenuAbierto }) {
     const location = useLocation()
     const { logout, usuario, estaAutorizado } = useAuth()
-    const { notificaciones, solicitarPermisoNotificaciones } = useNotificacion()
+    const {notificaciones, quitarNotificacion, solicitarPermisoNotificaciones} = useNotificacion()
     const [notificacionesPermitidas, setNotificacionesPermitidas] = useState(false)
 
     useEffect(() => {
@@ -27,6 +27,13 @@ function NavBar({ menuAbierto, setMenuAbierto }) {
         if (permiso) {
             setNotificacionesPermitidas(true);
         }
+    }
+
+    const abrirRecordatorios = () => {
+        // Al abrir la sección de recordatorios, considero vistas las notificaciones pendientes.
+        notificaciones.forEach((notificacion) => {
+            quitarNotificacion(notificacion.id)
+        })
     }
 
     return (
@@ -48,6 +55,7 @@ function NavBar({ menuAbierto, setMenuAbierto }) {
                         <Link
                             key={route.path}
                             to={route.path}
+                            onClick={route.path === '/recordatorios' ? abrirRecordatorios : undefined}
                             className={`flex items-center justify-center rounded-md p-3 transition ${location.pathname === route.path ? 'bg-[#701D2D] font-bold' : 'hover:bg-[#701D2D]'}`}
                         >
                             {menuAbierto ? (
