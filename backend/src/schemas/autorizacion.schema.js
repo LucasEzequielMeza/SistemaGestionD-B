@@ -61,9 +61,20 @@ export const registerSchema = z.object({
     })
     .regex(/[!@#$%^&*(),.?":{}|<>_\-\\[\]\/+=;'`~]/, {
         message: 'La contraseña debe contener al menos un carácter especial'
+    }),
+
+    repetirContraseña: z.string({
+        required_error: 'Debe repetir la contraseña',
+        invalid_type_error: 'La repetición de contraseña debe ser un texto'
     })
 
-}).strict();
+}).refine(
+    (datos) => datos.contraseña === datos.repetirContraseña,
+    {
+        message: 'Las contraseñas no coinciden',
+        path: ['repetirContraseña']
+    }
+).strict();
 
 
 export const loginSchema = z.object({

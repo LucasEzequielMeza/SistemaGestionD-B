@@ -804,6 +804,8 @@ export const obtenerTramitesPorEstado = async (req, res) => {
             GROUP BY
                 tramites.id,
                 tipos_tramite.codigo
+
+            ORDER BY CAST(tramites.numero_carpeta AS INTEGER) ASC
         `, [
             req.userId,
             estado

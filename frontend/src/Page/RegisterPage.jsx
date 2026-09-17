@@ -13,9 +13,11 @@ function RegisterPage() {
 
   const navigate = useNavigate()
 
-  const {register,
+  const {
+    register,
     handleSubmit, 
-    formState: { errors }
+    formState: { errors },
+    watch
   } = useForm();
 
   const onSubmit = handleSubmit(async (data) => {
@@ -66,9 +68,19 @@ function RegisterPage() {
           }
 
           <Label htmlFor="contraseña">Contraseña</Label>
-          <Input {...register("contraseña", { required: true})} type="password" placeholder="Contraseña" />
+          <Input {...register("contraseña", { required: true })} type="password" placeholder="Contraseña"/>
           {
-            errors.contraseña && <p className="text-red-500">La contraseña es requerida</p>
+              errors.contraseña && ( <p className="text-red-500">La contraseña es requerida</p>)
+          }
+
+          <Label htmlFor="repetirContraseña">Repetir contraseña</Label>
+          <Input {...register("repetirContraseña", { required: true, validate: (valor) => valor === watch("contraseña") || "Las contraseñas no coinciden"})}
+              type="password"
+              placeholder="Repetir contraseña"
+          />
+
+          {
+            errors.repetirContraseña && (<p className="text-red-500">{errors.repetirContraseña.message || "Debe repetir la contraseña"}</p>)
           }
 
           <div className="flex justify-center mt-4">

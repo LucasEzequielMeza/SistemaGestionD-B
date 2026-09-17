@@ -149,7 +149,7 @@ function TramiteForm() {
               })}
           />
           {errors.numero_carpeta && (
-            <p className='text-red-500'>El numero de carpeta es requerido</p>
+            <p className='text-red-500'>El numero de carpeta es requerido y solo pueden ser numeros</p>
           )}
           <Label htmlFor="nombre_cliente">Nombre del cliente</Label>
           <Input type="text" {...register('nombre_cliente', { required: true })} />
