@@ -94,11 +94,12 @@ export function NotificacionProvider({ children }) {
                     return null;
                 }
 
-                const diferencia =
-                    ahora.getTime() - tiempoNotificacionActual;
+                const ahoraMs = ahora.getTime();
+                const fechaEventoMs = fecha.getTime();
 
-                // Solo notifico durante los primeros 30 segundos desde la hora indicada.
-                if (diferencia >= 0 && diferencia <= 30000) {
+                // Si llegué tarde a revisar el recordatorio, igual lo notifico
+                // mientras todavía no haya pasado la hora del evento.
+                if (ahoraMs >= tiempoNotificacionActual && ahoraMs <= fechaEventoMs) {
                     return {
                         recordatorio,
                         tiempoNotificacionActual

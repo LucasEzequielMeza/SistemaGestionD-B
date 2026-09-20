@@ -8,7 +8,9 @@ export const obtenerRecordatorios = async (req, res) => {
             FROM recordatorios
 
             WHERE user_id = $1
-            AND completado = false`
+            AND completado = false
+            ORDER BY fecha_evento ASC, hora_evento ASC
+            `
             ,[req.userId]);
 
         return res.status(200).json(result.rows);

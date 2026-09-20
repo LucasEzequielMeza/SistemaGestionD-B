@@ -101,3 +101,52 @@ export const loginSchema = z.object({
     })
 
 }).strict();
+
+export const cambiarContraseñaSchema = z.object({
+
+    contraseñaActual: z.string({
+        required_error: 'La contraseña actual es requerida',
+        invalid_type_error: 'La contraseña actual debe ser un texto'
+    }),
+
+    nuevaContraseña: z.string({
+        required_error: 'La nueva contraseña es requerida',
+        invalid_type_error: 'La nueva contraseña debe ser un texto'
+    })
+    .min(8, {
+        message: 'La contraseña debe tener al menos 8 caracteres'
+    })
+    .max(72, {
+        message: 'La contraseña no puede superar los 72 caracteres'
+    })
+    .regex(/[A-Z]/, {
+        message: 'La contraseña debe contener al menos una letra mayúscula'
+    })
+    .regex(/[a-z]/, {
+        message: 'La contraseña debe contener al menos una letra minúscula'
+    })
+    .regex(/[0-9]/, {
+        message: 'La contraseña debe contener al menos un número'
+    })
+    .regex(/[!@#$%^&*(),.?":{}|<>_\-\\[\]\/+=;'`~]/, {
+        message: 'La contraseña debe contener al menos un carácter especial'
+    }),
+
+    repetirContraseña: z.string({
+        required_error: 'Debe repetir la contraseña',
+        invalid_type_error: 'La repetición de contraseña debe ser un texto'
+    })
+
+}).refine(
+    (datos) => datos.nuevaContraseña === datos.repetirContraseña,
+    {
+        message: 'Las contraseñas no coinciden',
+        path: ['repetirContraseña']
+    }
+).refine(
+    (datos) => datos.contraseñaActual !== datos.nuevaContraseña,
+    {
+        message: 'La nueva contraseña debe ser diferente a la contraseña actual',
+        path: ['nuevaContraseña']
+    }
+).strict();

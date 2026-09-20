@@ -9,7 +9,7 @@ export const publicRoutes = [
 
 export const privateRoutes = [
     {
-        name: 'Dashboard',
+        name: 'Resumen de trámites',
         path: '/tramites/dashboard',
         icon: MdDashboard
     },
@@ -39,3 +39,9 @@ export const privateRoutes = [
         icon: IoIosNotifications
     },
 ]
+
+export const privateRoutesOcultas = [
+    {
+        path: '/perfil'
+    }
+];

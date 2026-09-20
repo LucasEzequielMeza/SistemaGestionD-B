@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { IoLogOut } from "react-icons/io5";
 import { IoMenu } from "react-icons/io5";
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { privateRoutes } from './navegacion.js'
 import { useAuth } from '../../Context/ContextoAutorizacion'
 import { useNotificacion } from '../../Context/NotificacionContexto.jsx';
 
 function NavBar({ menuAbierto, setMenuAbierto }) {
     const location = useLocation()
+    const navigate = useNavigate()
     const { logout, usuario, estaAutorizado } = useAuth()
     const {notificaciones, quitarNotificacion, solicitarPermisoNotificaciones} = useNotificacion()
     const [notificacionesPermitidas, setNotificacionesPermitidas] = useState(false)
@@ -105,11 +106,14 @@ function NavBar({ menuAbierto, setMenuAbierto }) {
                     )}
 
                     {menuAbierto && usuario && (
-                        <p className="w-full rounded-md p-3 text-left hover:bg-[#701D2D]">
+                        <button
+                            type="button"
+                            onClick={() => navigate('/perfil')}
+                            className="w-full rounded-md p-3 text-left hover:bg-[#701D2D]"
+                        >
                             {usuario.nombre} {usuario.apellido}
-                        </p>
+                        </button>
                     )}
-
                     <button onClick={logout} className="w-full rounded-md p-3 text-left hover:bg-[#701D2D]">
                         {menuAbierto ? 'Cerrar sesión' : <IoLogOut className="text-xl"/>}
                     </button>

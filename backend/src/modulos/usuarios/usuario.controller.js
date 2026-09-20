@@ -136,32 +136,23 @@ export const actualizarUsuario = async (req, res) => {
 
 export const cambiarContraseña = async (req, res) => {
 
-    // Obtengo el ID del usuario desde la URL
-    const { id } = req.params;
+    // Obtengo el ID del usuario autenticado
+    const id = req.userId;
 
-    // Obtengo la nueva contraseña
-    const { contraseña } = req.body;
+    // Obtengo la contraseña actual y la nueva contraseña
+    const {
+        contraseñaActual,
+        nuevaContraseña
+    } = req.body;
 
     try {
 
-        // Genero el hash de la nueva contraseña
-        const hashContraseña = await bcrypt.hash(contraseña, 12);
-
-        // Actualizo la contraseña del usuario
+        // Busco la contraseña actual del usuario
         const result = await pool.query(`
-            
-            UPDATE usuarios
-
-            SET contraseña = $1
-
-            WHERE id = $2
-
-            RETURNING id, nombre, apellido, mail, activo
-
-        `, [
-            hashContraseña,
-            id
-        ]);
+            SELECT contraseña
+            FROM usuarios
+            WHERE id = $1
+        `, [id]);
 
         // Si no encuentro el usuario
         if (result.rows.length === 0) {
@@ -170,9 +161,37 @@ export const cambiarContraseña = async (req, res) => {
             });
         }
 
+        // Comparo la contraseña ingresada con la contraseña guardada
+        const contraseñaCorrecta = await bcrypt.compare(
+            contraseñaActual,
+            result.rows[0].contraseña
+        );
+
+        // Si la contraseña actual no coincide
+        if (!contraseñaCorrecta) {
+            return res.status(400).json({
+                error: 'La contraseña actual es incorrecta'
+            });
+        }
+
+        // Genero el hash de la nueva contraseña
+        const hashContraseña = await bcrypt.hash(
+            nuevaContraseña,
+            12
+        );
+
+        // Actualizo la contraseña del usuario
+        await pool.query(`
+            UPDATE usuarios
+            SET contraseña = $1
+            WHERE id = $2
+        `, [
+            hashContraseña,
+            id
+        ]);
+
         return res.json({
-            message: 'Contraseña actualizada correctamente',
-            usuario: result.rows[0]
+            message: 'Contraseña actualizada correctamente'
         });
 
     } catch (error) {

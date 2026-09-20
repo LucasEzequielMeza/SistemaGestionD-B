@@ -29,7 +29,7 @@ function DashboardPage() {
 
     return (
         <div>
-            <h1 className="text-4xl text-black font-bold my-6">Dashboard</h1>
+            <h1 className="text-4xl text-black font-bold my-6">Resumen de trámites</h1>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
 

@@ -12,6 +12,8 @@ import TramiteDetalle from "./Components/tramites/TramiteDetalle"
 import RecordatorioForm from "./Components/recordatorios/RecordatorioForm"
 import RecordatorioDetalle from "./Components/recordatorios/RecordatorioDetalle"
 import DashboardPage from "./Page/DashboardPage"
+import PerfilPage from "./Page/PerfilPage"
+import CambiarContraseñaPage from "./Page/CambiarContraseñaPage"
 import Navbar from "./Components/navbar/Navbar"
 import Container from "./Components/UI/Container"
 import RutaProtegida from "./Components/autorizacion/RutaProtegida"
@@ -68,6 +70,9 @@ function App() {
               <Route path="/tramite/nuevo" element={<TramiteForm />} />
               <Route path="/tramite/:id/edit" element={<TramiteForm />} />
               <Route path="/tramites/detalle/:id" element={<TramiteDetalle />} />
+
+              <Route path="/perfil" element={<PerfilPage />} />
+              <Route path="/perfil/cambiar-contraseña" element={<CambiarContraseñaPage />}/>
 
               {/* Recordatorios */}
               <Route path="/recordatorios" element={<RecordatoriosPage />} />
